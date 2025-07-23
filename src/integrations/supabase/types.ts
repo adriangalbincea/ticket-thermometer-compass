@@ -14,13 +14,129 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      feedback_links: {
+        Row: {
+          created_at: string
+          customer_email: string | null
+          customer_name: string | null
+          expires_at: string
+          id: string
+          is_used: boolean
+          technician: string
+          ticket_number: string
+          ticket_title: string
+          token: string
+          updated_at: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          expires_at: string
+          id?: string
+          is_used?: boolean
+          technician: string
+          ticket_number: string
+          ticket_title: string
+          token: string
+          updated_at?: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          expires_at?: string
+          id?: string
+          is_used?: boolean
+          technician?: string
+          ticket_number?: string
+          ticket_title?: string
+          token?: string
+          updated_at?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
+      feedback_submissions: {
+        Row: {
+          comment: string | null
+          customer_ip: string | null
+          feedback_link_id: string | null
+          feedback_type: string
+          id: string
+          submitted_at: string
+        }
+        Insert: {
+          comment?: string | null
+          customer_ip?: string | null
+          feedback_link_id?: string | null
+          feedback_type: string
+          id?: string
+          submitted_at?: string
+        }
+        Update: {
+          comment?: string | null
+          customer_ip?: string | null
+          feedback_link_id?: string | null
+          feedback_type?: string
+          id?: string
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_submissions_feedback_link_id_fkey"
+            columns: ["feedback_link_id"]
+            isOneToOne: false
+            referencedRelation: "feedback_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_feedback_link: {
+        Args: {
+          p_ticket_number: string
+          p_technician: string
+          p_ticket_title: string
+          p_customer_email?: string
+          p_customer_name?: string
+          p_expires_hours?: number
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
