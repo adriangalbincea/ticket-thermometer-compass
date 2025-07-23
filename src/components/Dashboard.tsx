@@ -5,8 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { CalendarDays, Filter, Download, Users, TrendingUp, Clock, Star } from 'lucide-react';
+import { CalendarDays, Filter, Download, Users, TrendingUp, Clock, Star, Calendar } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
 
 // Mock data
 const feedbackData = [
@@ -46,17 +49,22 @@ export const Dashboard: React.FC = () => {
   const [selectedTechnician, setSelectedTechnician] = useState('all');
   const [selectedFeedback, setSelectedFeedback] = useState('all');
   const [dateRange, setDateRange] = useState('all');
+  const [selectedYear, setSelectedYear] = useState('2024');
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
 
-  const filteredData = feedbackData.filter(item => {
-    const matchesSearch = item.ticketNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.technician.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.customer.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTechnician = selectedTechnician === 'all' || item.technician === selectedTechnician;
-    const matchesFeedback = selectedFeedback === 'all' || item.feedback === selectedFeedback;
-    
-    return matchesSearch && matchesTechnician && matchesFeedback;
-  });
+  const filteredData = feedbackData
+    .filter(item => {
+      const matchesSearch = item.ticketNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           item.technician.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           item.customer.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesTechnician = selectedTechnician === 'all' || item.technician === selectedTechnician;
+      const matchesFeedback = selectedFeedback === 'all' || item.feedback === selectedFeedback;
+      
+      return matchesSearch && matchesTechnician && matchesFeedback;
+    })
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // Sort newest first
 
   const getFeedbackBadge = (feedback: string) => {
     const variants = {
@@ -84,6 +92,132 @@ export const Dashboard: React.FC = () => {
           Export Report
         </Button>
       </div>
+
+      {/* Feedback Records - Moved to Top */}
+      <Card className="shadow-elegant">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="h-5 w-5" />
+            Feedback Records
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-4 mb-6">
+            <Input
+              placeholder="Search tickets, technicians, or customers..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-sm"
+            />
+            
+            <Select value={selectedTechnician} onValueChange={setSelectedTechnician}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Select technician" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Technicians</SelectItem>
+                <SelectItem value="John Smith">John Smith</SelectItem>
+                <SelectItem value="Sarah Wilson">Sarah Wilson</SelectItem>
+                <SelectItem value="Mike Davis">Mike Davis</SelectItem>
+                <SelectItem value="Lisa Chen">Lisa Chen</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedFeedback} onValueChange={setSelectedFeedback}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Feedback type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Feedback</SelectItem>
+                <SelectItem value="happy">Happy</SelectItem>
+                <SelectItem value="neutral">Neutral</SelectItem>
+                <SelectItem value="bad">Bad</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedYear} onValueChange={setSelectedYear}>
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="Year" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="2024">2024</SelectItem>
+                <SelectItem value="2023">2023</SelectItem>
+                <SelectItem value="2022">2022</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-48 justify-start text-left font-normal">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  {startDate ? format(startDate, "PPP") : "Start Date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={startDate}
+                  onSelect={setStartDate}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-48 justify-start text-left font-normal">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  {endDate ? format(endDate, "PPP") : "End Date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={endDate}
+                  onSelect={setEndDate}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* Table */}
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Ticket</TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Technician</TableHead>
+                  <TableHead>Issue</TableHead>
+                  <TableHead>Feedback</TableHead>
+                  <TableHead>Comment</TableHead>
+                  <TableHead>Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredData.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium">{item.ticketNumber}</TableCell>
+                    <TableCell>{item.customer}</TableCell>
+                    <TableCell>{item.technician}</TableCell>
+                    <TableCell>{item.title}</TableCell>
+                    <TableCell>
+                      <Badge className={getFeedbackBadge(item.feedback)}>
+                        {item.feedback}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="max-w-xs truncate">{item.comment}</TableCell>
+                    <TableCell>{item.date}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -134,13 +268,13 @@ export const Dashboard: React.FC = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="shadow-card">
+        <Card className="shadow-card cursor-pointer hover:shadow-lg transition-shadow">
           <CardHeader>
             <CardTitle>Weekly Feedback Distribution</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
+              <BarChart data={chartData} onClick={(data) => console.log('Chart clicked:', data)}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -153,13 +287,13 @@ export const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="shadow-card">
+        <Card className="shadow-card cursor-pointer hover:shadow-lg transition-shadow">
           <CardHeader>
             <CardTitle>Feedback Distribution</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
+              <PieChart onClick={(data) => console.log('Pie chart clicked:', data)}>
                 <Pie
                   data={pieData}
                   cx="50%"
@@ -182,13 +316,13 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* Satisfaction Trend */}
-      <Card className="shadow-card">
+      <Card className="shadow-card cursor-pointer hover:shadow-lg transition-shadow">
         <CardHeader>
           <CardTitle>Satisfaction Trend</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={trendData}>
+            <LineChart data={trendData} onClick={(data) => console.log('Line chart clicked:', data)}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis domain={[80, 100]} />
@@ -202,97 +336,6 @@ export const Dashboard: React.FC = () => {
               />
             </LineChart>
           </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Filters */}
-      <Card className="shadow-elegant">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Feedback Records
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-4 mb-6">
-            <Input
-              placeholder="Search tickets, technicians, or customers..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-sm"
-            />
-            
-            <Select value={selectedTechnician} onValueChange={setSelectedTechnician}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Select technician" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Technicians</SelectItem>
-                <SelectItem value="John Smith">John Smith</SelectItem>
-                <SelectItem value="Sarah Wilson">Sarah Wilson</SelectItem>
-                <SelectItem value="Mike Davis">Mike Davis</SelectItem>
-                <SelectItem value="Lisa Chen">Lisa Chen</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={selectedFeedback} onValueChange={setSelectedFeedback}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Feedback type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Feedback</SelectItem>
-                <SelectItem value="happy">Happy</SelectItem>
-                <SelectItem value="neutral">Neutral</SelectItem>
-                <SelectItem value="bad">Bad</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Date range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Time</SelectItem>
-                <SelectItem value="today">Today</SelectItem>
-                <SelectItem value="week">This Week</SelectItem>
-                <SelectItem value="month">This Month</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Table */}
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Ticket</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Technician</TableHead>
-                  <TableHead>Issue</TableHead>
-                  <TableHead>Feedback</TableHead>
-                  <TableHead>Comment</TableHead>
-                  <TableHead>Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredData.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.ticketNumber}</TableCell>
-                    <TableCell>{item.customer}</TableCell>
-                    <TableCell>{item.technician}</TableCell>
-                    <TableCell>{item.title}</TableCell>
-                    <TableCell>
-                      <Badge className={getFeedbackBadge(item.feedback)}>
-                        {item.feedback}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="max-w-xs truncate">{item.comment}</TableCell>
-                    <TableCell>{item.date}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
         </CardContent>
       </Card>
     </div>

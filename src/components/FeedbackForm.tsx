@@ -93,44 +93,44 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
         </div>
 
         {/* Feedback Buttons */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-3 gap-6 mb-6">
           <Button
             variant={selectedFeedback === 'bad' ? 'default' : 'outline'}
-            className={`h-24 flex-col gap-2 transition-all duration-200 ${
+            className={`h-32 flex-col gap-3 transition-all duration-200 hover:scale-105 ${
               selectedFeedback === 'bad' 
-                ? 'bg-feedback-bad text-feedback-bad-foreground hover:bg-feedback-bad/90' 
-                : 'hover:bg-feedback-bad/10 hover:border-feedback-bad'
+                ? 'bg-feedback-bad text-feedback-bad-foreground hover:bg-feedback-bad/90 shadow-lg' 
+                : 'hover:bg-feedback-bad/10 hover:border-feedback-bad bg-feedback-bad/5'
             }`}
             onClick={() => handleFeedbackSelect('bad')}
           >
-            <Frown className="h-8 w-8" />
-            <span className="font-medium">Bad</span>
+            <div className="text-4xl">😞</div>
+            <span className="font-medium text-lg">Bad</span>
           </Button>
 
           <Button
             variant={selectedFeedback === 'neutral' ? 'default' : 'outline'}
-            className={`h-24 flex-col gap-2 transition-all duration-200 ${
+            className={`h-32 flex-col gap-3 transition-all duration-200 hover:scale-105 ${
               selectedFeedback === 'neutral' 
-                ? 'bg-feedback-neutral text-feedback-neutral-foreground hover:bg-feedback-neutral/90' 
-                : 'hover:bg-feedback-neutral/10 hover:border-feedback-neutral'
+                ? 'bg-feedback-neutral text-feedback-neutral-foreground hover:bg-feedback-neutral/90 shadow-lg' 
+                : 'hover:bg-feedback-neutral/10 hover:border-feedback-neutral bg-feedback-neutral/5'
             }`}
             onClick={() => handleFeedbackSelect('neutral')}
           >
-            <Meh className="h-8 w-8" />
-            <span className="font-medium">Neutral</span>
+            <div className="text-4xl">😐</div>
+            <span className="font-medium text-lg">Neutral</span>
           </Button>
 
           <Button
             variant={selectedFeedback === 'happy' ? 'default' : 'outline'}
-            className={`h-24 flex-col gap-2 transition-all duration-200 ${
+            className={`h-32 flex-col gap-3 transition-all duration-200 hover:scale-105 ${
               selectedFeedback === 'happy' 
-                ? 'bg-feedback-happy text-feedback-happy-foreground hover:bg-feedback-happy/90' 
-                : 'hover:bg-feedback-happy/10 hover:border-feedback-happy'
+                ? 'bg-feedback-happy text-feedback-happy-foreground hover:bg-feedback-happy/90 shadow-lg' 
+                : 'hover:bg-feedback-happy/10 hover:border-feedback-happy bg-feedback-happy/5'
             }`}
             onClick={() => handleFeedbackSelect('happy')}
           >
-            <Smile className="h-8 w-8" />
-            <span className="font-medium">Happy</span>
+            <div className="text-4xl">😊</div>
+            <span className="font-medium text-lg">Happy</span>
           </Button>
         </div>
 
