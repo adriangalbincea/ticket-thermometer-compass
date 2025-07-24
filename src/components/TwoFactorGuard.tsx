@@ -12,12 +12,21 @@ export const TwoFactorGuard: React.FC<TwoFactorGuardProps> = ({ children }) => {
   const { user, check2FARequirement } = useAuth();
   const [needsTwoFA, setNeedsTwoFA] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [hasChecked, setHasChecked] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const checkTwoFARequirement = async () => {
       if (!user) {
         setLoading(false);
+        setHasChecked(false);
+        return;
+      }
+
+      // If we've already checked and user has 2FA verified in session, skip the check
+      if (hasChecked && sessionStorage.getItem(`2fa_verified_${user.id}`)) {
+        setLoading(false);
+        setNeedsTwoFA(false);
         return;
       }
 
@@ -47,6 +56,7 @@ export const TwoFactorGuard: React.FC<TwoFactorGuardProps> = ({ children }) => {
             console.log('TwoFactorGuard: Showing 2FA prompt/setup');
             setNeedsTwoFA(true);
             setLoading(false);
+            setHasChecked(true);
             return;
           }
         }
@@ -54,14 +64,16 @@ export const TwoFactorGuard: React.FC<TwoFactorGuardProps> = ({ children }) => {
         console.log('TwoFactorGuard: No 2FA needed, showing content');
         setNeedsTwoFA(false);
         setLoading(false);
+        setHasChecked(true);
       } catch (error) {
         console.error('TwoFactorGuard: Error checking 2FA:', error);
         setLoading(false);
+        setHasChecked(true);
       }
     };
 
     checkTwoFARequirement();
-  }, [user, check2FARequirement]);
+  }, [user, check2FARequirement, hasChecked]);
 
   const handle2FASuccess = async () => {
     console.log('TwoFactorGuard: 2FA verified successfully');
