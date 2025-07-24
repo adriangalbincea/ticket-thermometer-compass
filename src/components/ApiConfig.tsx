@@ -196,10 +196,12 @@ export const ApiConfig: React.FC = () => {
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => window.open('TESTING_GUIDE.md', '_blank')}
+              asChild
             >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              View Testing Guide
+              <a href="/api-test-guide">
+                <ExternalLink className="h-4 w-4 mr-2" />
+                API Test Guide
+              </a>
             </Button>
           </div>
         </div>
