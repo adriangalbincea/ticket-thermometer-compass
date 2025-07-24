@@ -14,10 +14,10 @@ const Auth: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [checking2FA, setChecking2FA] = useState(false);
   const [user, setUser] = useState(null);
   const [show2FA, setShow2FA] = useState(false);
   const [pendingUser, setPendingUser] = useState(null);
-  const [checking2FA, setChecking2FA] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { check2FARequirement } = useAuth();
@@ -37,8 +37,13 @@ const Auth: React.FC = () => {
     // Listen for auth changes - but don't navigate automatically
     // Let the component handle navigation based on 2FA requirements
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state change:', event, 'checking2FA:', checking2FA);
       if (session?.user) {
         setUser(session.user);
+        // Only navigate if we're not checking 2FA
+        if (!checking2FA && !show2FA) {
+          navigate('/admin');
+        }
       } else {
         setUser(null);
       }
@@ -50,6 +55,7 @@ const Auth: React.FC = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setChecking2FA(true);
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -91,6 +97,7 @@ const Auth: React.FC = () => {
           setShow2FA(true);
           console.log('Called setShow2FA(true)');
           setLoading(false);
+          setChecking2FA(false);
           return;
         } else {
           // Admin user needs to set up 2FA but hasn't yet
@@ -101,10 +108,12 @@ const Auth: React.FC = () => {
             variant: "destructive",
           });
           setLoading(false);
+          setChecking2FA(false);
           return;
         }
       } else {
         console.log('2FA is not required for this user');
+        setChecking2FA(false);
       }
 
       // No 2FA required, proceed with normal login
@@ -123,6 +132,7 @@ const Auth: React.FC = () => {
       });
     } finally {
       setLoading(false);
+      setChecking2FA(false);
     }
   };
 
