@@ -1,21 +1,47 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BarChart3, MessageSquare, Settings, Home, LogOut, LogIn } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 export const Navigation: React.FC = () => {
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const [userRole, setUserRole] = useState<string | null>(null);
   
   const isActive = (path: string) => location.pathname === path;
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user role:', error);
+        } else {
+          setUserRole(data?.role || 'user');
+        }
+      } catch (error) {
+        console.error('Error fetching user role:', error);
+      }
+    };
+
+    fetchUserRole();
+  }, [user]);
   
   const publicNavItems: any[] = [];
 
   const protectedNavItems = [
     { path: '/admin', label: 'Home', icon: Home },
-    { path: '/config', label: 'Configuration', icon: Settings }
+    ...(userRole === 'admin' ? [{ path: '/config', label: 'Configuration', icon: Settings }] : [])
   ];
 
   const handleSignOut = async () => {

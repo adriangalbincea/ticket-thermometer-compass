@@ -83,11 +83,8 @@ export const UserManagement: React.FC = () => {
 
       // Check if user already exists (success with warning)
       if (data?.warning) {
-        toast({
-          title: "Warning",
-          description: data.warning,
-          variant: "destructive",
-        });
+        setShowPasswordDialog(true);
+        setTempPassword('USER_EXISTS');
         setNewUser({ email: '', full_name: '', role: 'user' });
         setIsDialogOpen(false);
         return;
@@ -349,23 +346,32 @@ export const UserManagement: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Password Dialog */}
+      {/* Password/Warning Dialog */}
       <AlertDialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-md mx-auto">
           <AlertDialogHeader>
-            <AlertDialogTitle>User Created Successfully</AlertDialogTitle>
+            <AlertDialogTitle>
+              {tempPassword === 'USER_EXISTS' ? 'User Already Exists' : 'User Created Successfully'}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              The user has been created with a temporary password. Please share this password securely with the user.
+              {tempPassword === 'USER_EXISTS' 
+                ? 'A user with this email address already exists in the system. No new user was created.'
+                : 'The user has been created with a temporary password. Please share this password securely with the user.'
+              }
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="p-4 bg-muted rounded-lg font-mono text-sm">
-            {tempPassword}
-          </div>
+          {tempPassword !== 'USER_EXISTS' && (
+            <div className="p-4 bg-muted rounded-lg font-mono text-sm">
+              {tempPassword}
+            </div>
+          )}
           <AlertDialogFooter>
-            <Button variant="outline" onClick={copyPassword}>
-              <Copy className="h-4 w-4 mr-2" />
-              Copy Password
-            </Button>
+            {tempPassword !== 'USER_EXISTS' && (
+              <Button variant="outline" onClick={copyPassword}>
+                <Copy className="h-4 w-4 mr-2" />
+                Copy Password
+              </Button>
+            )}
             <AlertDialogAction onClick={() => setShowPasswordDialog(false)}>
               Close
             </AlertDialogAction>
