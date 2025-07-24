@@ -75,8 +75,10 @@ const Auth: React.FC = () => {
         return;
       }
 
+      console.log('Checking 2FA requirement for user:', data.user.email);
       // Check if 2FA is required for this user
       const requires2FA = await check2FARequirement();
+      console.log('2FA required:', requires2FA);
       
       if (requires2FA) {
         // Check if user has 2FA enabled
@@ -86,11 +88,15 @@ const Auth: React.FC = () => {
           .eq('user_id', data.user.id)
           .single();
 
+        console.log('User 2FA data:', userTwoFA);
+
         if (userTwoFA?.is_enabled) {
+          console.log('Showing 2FA prompt for user');
           // Store pending user and show 2FA prompt
           setPendingUser(data.user);
           setShow2FA(true);
-          // Don't sign out, just show the 2FA prompt
+          // Sign out immediately to prevent access without 2FA
+          await supabase.auth.signOut();
           return;
         } else {
           // Admin user needs to set up 2FA but hasn't yet
@@ -131,6 +137,24 @@ const Auth: React.FC = () => {
   const handle2FASuccess = async () => {
     if (!pendingUser) return;
     
+    // Re-authenticate the user after successful 2FA
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      toast({
+        title: "Authentication error",
+        description: error.message,
+        variant: "destructive",
+      });
+      setShow2FA(false);
+      setPendingUser(null);
+      setChecking2FA(false);
+      return;
+    }
+
     setShow2FA(false);
     setPendingUser(null);
     setChecking2FA(false);
@@ -140,7 +164,7 @@ const Auth: React.FC = () => {
       description: "You've been signed in successfully.",
     });
     
-    navigate('/admin');
+    // Let the auth state listener handle navigation
   };
 
   const handle2FACancel = async () => {
