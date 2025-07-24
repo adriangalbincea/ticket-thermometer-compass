@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { RoleBasedAccess } from "@/components/RoleBasedAccess";
+import { TwoFactorGuard } from "@/components/TwoFactorGuard";
 import Profile from "./pages/Profile";
 import GenerateLinks from "./pages/GenerateLinks";
 import Feedback from "./pages/Feedback";
@@ -34,7 +35,9 @@ const AppRoutes = () => {
       <Route path="/auth" element={user ? <Navigate to="/admin" replace /> : <Auth />} />
       <Route path="/admin" element={
         <ProtectedRoute>
-          <Admin />
+          <TwoFactorGuard>
+            <Admin />
+          </TwoFactorGuard>
         </ProtectedRoute>
       } />
       <Route path="/feedback/:token" element={<Feedback />} />
