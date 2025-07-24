@@ -25,9 +25,6 @@ const Auth: React.FC = () => {
   useEffect(() => {
     // Check if user is already logged in
     const checkUser = async () => {
-      // Don't check initial session if we're already in 2FA flow
-      if (checking2FA || show2FA) return;
-      
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setUser(session.user);
@@ -37,31 +34,22 @@ const Auth: React.FC = () => {
 
     checkUser();
 
-    // Listen for auth changes
+    // Listen for auth changes - only navigate if not in 2FA flow
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event, 'checking2FA:', checking2FA, 'show2FA:', show2FA);
-      
-      // Don't interfere with 2FA flow
-      if (checking2FA || show2FA) {
-        console.log('Ignoring auth state change during 2FA flow');
-        return;
-      }
-      
-      if (session?.user) {
+      if (session?.user && !show2FA) {
         setUser(session.user);
         navigate('/admin');
-      } else {
+      } else if (!session?.user) {
         setUser(null);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, checking2FA, show2FA]);
+  }, [navigate, show2FA]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setChecking2FA(true);
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -70,7 +58,6 @@ const Auth: React.FC = () => {
       });
 
       if (error) {
-        setChecking2FA(false);
         toast({
           title: "Sign in failed",
           description: error.message,
@@ -80,10 +67,8 @@ const Auth: React.FC = () => {
         return;
       }
 
-      console.log('Checking 2FA requirement for user:', data.user.email);
       // Check if 2FA is required for this user
       const requires2FA = await check2FARequirement();
-      console.log('2FA required:', requires2FA);
       
       if (requires2FA) {
         // Check if user has 2FA enabled
@@ -93,21 +78,14 @@ const Auth: React.FC = () => {
           .eq('user_id', data.user.id)
           .single();
 
-        console.log('User 2FA data:', userTwoFA);
-
         if (userTwoFA?.is_enabled) {
-          console.log('Showing 2FA prompt for user');
-          // Store pending user and show 2FA prompt
+          // Show 2FA prompt - keep user logged in
           setPendingUser(data.user);
           setShow2FA(true);
-          // Small delay to ensure state updates before signing out
-          setTimeout(async () => {
-            await supabase.auth.signOut();
-          }, 100);
+          setLoading(false);
           return;
         } else {
           // Admin user needs to set up 2FA but hasn't yet
-          setChecking2FA(false);
           await supabase.auth.signOut();
           toast({
             title: "2FA Setup Required",
@@ -120,14 +98,11 @@ const Auth: React.FC = () => {
       }
 
       // No 2FA required, proceed with normal login
-      setChecking2FA(false);
-
       toast({
         title: "Welcome back!",
         description: "You've been signed in successfully.",
       });
     } catch (error) {
-      setChecking2FA(false);
       toast({
         title: "Error",
         description: "An unexpected error occurred.",
@@ -135,50 +110,24 @@ const Auth: React.FC = () => {
       });
     } finally {
       setLoading(false);
-      if (!show2FA) {
-        setChecking2FA(false);
-      }
     }
   };
 
   const handle2FASuccess = async () => {
-    if (!pendingUser) return;
-    
-    // Re-authenticate the user after successful 2FA
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      toast({
-        title: "Authentication error",
-        description: error.message,
-        variant: "destructive",
-      });
-      setShow2FA(false);
-      setPendingUser(null);
-      setChecking2FA(false);
-      return;
-    }
-
     setShow2FA(false);
     setPendingUser(null);
-    setChecking2FA(false);
     
     toast({
       title: "Welcome back!",
-      description: "You've been signed in successfully.",
+      description: "Two-factor authentication verified successfully.",
     });
     
-    // Let the auth state listener handle navigation
+    // Let auth state listener handle navigation
   };
 
   const handle2FACancel = async () => {
     setShow2FA(false);
     setPendingUser(null);
-    setChecking2FA(false);
-    // Sign out the user since they cancelled 2FA
     await supabase.auth.signOut();
   };
 
