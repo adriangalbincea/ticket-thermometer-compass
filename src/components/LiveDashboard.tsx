@@ -214,9 +214,10 @@ export const LiveDashboard: React.FC = () => {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="shadow-elegant cursor-pointer hover:shadow-card transition-shadow duration-200" onClick={() => {
-          // No specific filter for total feedback
+          setSelectedFeedback('all');
+          setSelectedTechnician('all');
           toast({
-            title: "Total Feedback",
+            title: "Filters Cleared",
             description: "Showing all feedback responses",
           });
         }}>
@@ -265,14 +266,15 @@ export const LiveDashboard: React.FC = () => {
         </Card>
 
         <Card className="shadow-elegant cursor-pointer hover:shadow-card transition-shadow duration-200" onClick={() => {
-          // No specific filter for technicians
+          setSelectedFeedback('all');
+          setSelectedTechnician('all');
           toast({
-            title: "Active Technicians",
-            description: `${uniqueTechnicians.length} technicians are handling tickets`,
+            title: "Filters Cleared",
+            description: `Showing all feedback from ${uniqueTechnicians.length} technicians`,
           });
         }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Technicians</CardTitle>
+            <CardTitle className="text-sm font-medium">Technicians</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
