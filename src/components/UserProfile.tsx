@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,15 +7,43 @@ import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { User, Lock, Check, X } from 'lucide-react';
 
 export const UserProfile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [userProfile, setUserProfile] = useState<{ full_name: string } | null>(null);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Fetch user profile data
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user profile:', error);
+        } else {
+          setUserProfile(data);
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, [user]);
 
   // Password validation
   const passwordRequirements = {
@@ -64,13 +92,19 @@ export const UserProfile: React.FC = () => {
       } else {
         toast({
           title: "Password Updated",
-          description: "Your password has been changed successfully.",
+          description: "Your password has been changed successfully. Please sign in again.",
         });
         
         // Clear form
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
+        
+        // Sign out user and redirect to login
+        setTimeout(async () => {
+          await signOut();
+          navigate('/auth');
+        }, 2000);
       }
     } catch (error) {
       toast({
@@ -95,12 +129,12 @@ export const UserProfile: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Email</Label>
-            <Input value={user?.email || ''} disabled />
+            <Label>Name</Label>
+            <Input value={userProfile?.full_name || 'Not set'} disabled />
           </div>
           <div className="space-y-2">
-            <Label>User ID</Label>
-            <Input value={user?.id || ''} disabled className="font-mono text-sm" />
+            <Label>Email</Label>
+            <Input value={user?.email || ''} disabled />
           </div>
         </CardContent>
       </Card>
