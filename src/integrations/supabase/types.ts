@@ -145,36 +145,6 @@ export type Database = {
         }
         Relationships: []
       }
-      webhook_config: {
-        Row: {
-          created_at: string
-          enabled: boolean | null
-          events: string[] | null
-          id: string
-          secret_key: string | null
-          updated_at: string
-          webhook_url: string | null
-        }
-        Insert: {
-          created_at?: string
-          enabled?: boolean | null
-          events?: string[] | null
-          id?: string
-          secret_key?: string | null
-          updated_at?: string
-          webhook_url?: string | null
-        }
-        Update: {
-          created_at?: string
-          enabled?: boolean | null
-          events?: string[] | null
-          id?: string
-          secret_key?: string | null
-          updated_at?: string
-          webhook_url?: string | null
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never

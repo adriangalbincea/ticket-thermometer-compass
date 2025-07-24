@@ -29,7 +29,7 @@ export const Home = () => {
           <CardContent>
             <p className="text-muted-foreground">
               One-click feedback with happy, neutral, and bad options. 
-              Auto-populated ticket information from webhooks.
+              Auto-populated ticket information and customizable forms.
             </p>
           </CardContent>
         </Card>
@@ -58,7 +58,7 @@ export const Home = () => {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Webhook support, email notifications, and database integration. 
+              API integration, email notifications, and database storage. 
               Secure authentication and role management.
             </p>
           </CardContent>
@@ -79,7 +79,7 @@ export const Home = () => {
               </h3>
               <ul className="space-y-2 text-muted-foreground">
                 <li>• One-click smiley face feedback (Bad, Neutral, Happy)</li>
-                <li>• Auto-populated ticket information via webhooks</li>
+                <li>• Auto-populated ticket information via API</li>
                 <li>• Optional comment field for detailed feedback</li>
                 <li>• Mobile-responsive design</li>
                 <li>• Fast loading and simple interface</li>
@@ -122,7 +122,7 @@ export const Home = () => {
               <ul className="space-y-2 text-muted-foreground">
                 <li>• HTTPS security with SSL certificates</li>
                 <li>• PostgreSQL database integration</li>
-                <li>• Webhook endpoints for ticket systems</li>
+                <li>• API endpoints for ticket system integration</li>
                 <li>• Secure link generation with expiry</li>
                 <li>• API endpoints for integration</li>
               </ul>
