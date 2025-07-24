@@ -85,9 +85,11 @@ const Auth: React.FC = () => {
 
         if (userTwoFA?.is_enabled) {
           console.log('User has 2FA enabled, showing prompt...');
+          console.log('Current show2FA state before setting:', show2FA);
           // Show 2FA prompt - keep user logged in
           setPendingUser(data.user);
           setShow2FA(true);
+          console.log('Called setShow2FA(true)');
           setLoading(false);
           return;
         } else {
