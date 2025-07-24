@@ -5,7 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Filter, Download, Users, TrendingUp, Clock, Star, RefreshCw } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import type { DateRange } from 'react-day-picker';
+import { Filter, Download, Users, TrendingUp, Clock, Star, RefreshCw, CalendarIcon } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -28,6 +32,8 @@ export const LiveDashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTechnician, setSelectedTechnician] = useState('all');
   const [selectedFeedback, setSelectedFeedback] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
+  const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>(undefined);
   const { toast } = useToast();
 
   const loadFeedbackData = async () => {
@@ -96,7 +102,29 @@ export const LiveDashboard: React.FC = () => {
     const matchesTechnician = selectedTechnician === 'all' || item.technician === selectedTechnician;
     const matchesFeedback = selectedFeedback === 'all' || item.feedback_type === selectedFeedback;
     
-    return matchesSearch && matchesTechnician && matchesFeedback;
+    // Date filtering
+    const itemDate = new Date(item.submitted_at);
+    const now = new Date();
+    let matchesDate = true;
+
+    if (dateFilter === 'today') {
+      matchesDate = itemDate.toDateString() === now.toDateString();
+    } else if (dateFilter === 'week') {
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      matchesDate = itemDate >= weekAgo;
+    } else if (dateFilter === 'month') {
+      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      matchesDate = itemDate >= monthAgo;
+    } else if (dateFilter === 'year') {
+      const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+      matchesDate = itemDate >= yearAgo;
+    } else if (dateFilter === 'custom' && customDateRange?.from) {
+      const fromDate = customDateRange.from;
+      const toDate = customDateRange.to || now;
+      matchesDate = itemDate >= fromDate && itemDate <= toDate;
+    }
+    
+    return matchesSearch && matchesTechnician && matchesFeedback && matchesDate;
   });
 
   const getFeedbackBadge = (feedback: string) => {
@@ -318,6 +346,53 @@ export const LiveDashboard: React.FC = () => {
                 <SelectItem value="bad">Bad</SelectItem>
               </SelectContent>
             </Select>
+
+            <Select value={dateFilter} onValueChange={setDateFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Date range" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Time</SelectItem>
+                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="week">Last 7 Days</SelectItem>
+                <SelectItem value="month">Last 30 Days</SelectItem>
+                <SelectItem value="year">Last Year</SelectItem>
+                <SelectItem value="custom">Custom Range</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {dateFilter === 'custom' && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-60 justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {customDateRange?.from ? (
+                      customDateRange.to ? (
+                        <>
+                          {format(customDateRange.from, "LLL dd, y")} -{" "}
+                          {format(customDateRange.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(customDateRange.from, "LLL dd, y")
+                      )
+                    ) : (
+                      <span>Pick a date range</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={customDateRange?.from}
+                    selected={customDateRange}
+                    onSelect={setCustomDateRange}
+                    numberOfMonths={2}
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+            )}
           </div>
 
           {/* Table */}

@@ -16,6 +16,7 @@ export const Navigation: React.FC = () => {
   const protectedNavItems = [
     { path: '/admin', label: 'Home', icon: Home },
     { path: '/config', label: 'Configuration', icon: Settings },
+    { path: '/api-test-guide', label: 'API Test Guide', icon: Settings }
   ];
 
   const handleSignOut = async () => {

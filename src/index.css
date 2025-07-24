@@ -2,37 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Customer Thermometer Design System - All colors MUST be HSL */
+/* WiseServe Design System - All colors MUST be HSL */
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 220 13% 18%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 13% 18%;
+    --card-foreground: 0 0% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 13% 18%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 217 32% 17%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 215 90% 15%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 220 13% 18%;
+    --secondary: 22 100% 49%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 218 27% 97%;
+    --muted-foreground: 0 0% 35%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 220 13% 18%;
+    --accent: 22 100% 62%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 217 32% 17%;
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 215 90% 15%;
 
     /* Feedback colors */
     --feedback-bad: 0 84% 60%;
@@ -50,15 +50,15 @@
     --chart-5: 27 87% 67%;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(217 32% 17%), hsl(217 32% 25%));
+    --gradient-primary: linear-gradient(135deg, hsl(22 100% 49%), hsl(22 100% 40%));
     --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 45%));
     --gradient-warning: linear-gradient(135deg, hsl(43 96% 56%), hsl(43 96% 65%));
     --gradient-danger: linear-gradient(135deg, hsl(0 84% 60%), hsl(0 84% 70%));
 
     /* Shadows */
-    --shadow-elegant: 0 4px 6px -1px hsl(220 13% 18% / 0.1), 0 2px 4px -1px hsl(220 13% 18% / 0.06);
-    --shadow-card: 0 10px 15px -3px hsl(220 13% 18% / 0.1), 0 4px 6px -2px hsl(220 13% 18% / 0.05);
-    --shadow-feedback: 0 20px 25px -5px hsl(220 13% 18% / 0.1), 0 10px 10px -5px hsl(220 13% 18% / 0.04);
+    --shadow-elegant: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.06);
+    --shadow-card: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -2px hsl(0 0% 0% / 0.05);
+    --shadow-feedback: 0 20px 25px -5px hsl(0 0% 0% / 0.1), 0 10px 10px -5px hsl(0 0% 0% / 0.04);
 
     --radius: 0.5rem;
 

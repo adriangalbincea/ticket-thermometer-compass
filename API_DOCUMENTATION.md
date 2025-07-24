@@ -5,7 +5,7 @@ This API allows you to generate secure feedback links for customer tickets. Each
 
 ## Endpoint
 ```
-POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link
+POST https://feedback.wiseserve.net/functions/v1/generate-feedback-link
 ```
 
 ## Authentication
@@ -32,7 +32,7 @@ Content-Type: application/json
 
 ### Example Request
 ```bash
-curl -X POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link \
+curl -X POST https://feedback.wiseserve.net/functions/v1/generate-feedback-link \
   -H "Content-Type: application/json" \
   -d '{
     "ticket_number": "TK-12345",
@@ -89,7 +89,7 @@ curl -X POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feed
 ### JavaScript/Node.js
 ```javascript
 const generateFeedbackLink = async (ticketData) => {
-  const response = await fetch('https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link', {
+  const response = await fetch('https://feedback.wiseserve.net/functions/v1/generate-feedback-link', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ import requests
 import json
 
 def generate_feedback_link(ticket_data):
-    url = "https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link"
+    url = "https://feedback.wiseserve.net/functions/v1/generate-feedback-link"
     
     payload = {
         "ticket_number": ticket_data["ticket_number"],
@@ -146,7 +146,7 @@ def generate_feedback_link(ticket_data):
 ```php
 <?php
 function generateFeedbackLink($ticketData) {
-    $url = 'https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link';
+    $url = 'https://feedback.wiseserve.net/functions/v1/generate-feedback-link';
     
     $payload = array(
         'ticket_number' => $ticketData['ticket_number'],

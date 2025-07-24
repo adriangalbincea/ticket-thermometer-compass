@@ -8,6 +8,7 @@ import Feedback from "./pages/Feedback";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
 import Config from "./pages/Config";
+import ApiTestGuide from "./pages/ApiTestGuide";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -34,7 +35,16 @@ const AppRoutes = () => {
         </ProtectedRoute>
       } />
       <Route path="/feedback/:token" element={<Feedback />} />
-      <Route path="/config" element={<Config />} />
+      <Route path="/config" element={
+        <ProtectedRoute>
+          <Config />
+        </ProtectedRoute>
+      } />
+      <Route path="/api-test-guide" element={
+        <ProtectedRoute>
+          <ApiTestGuide />
+        </ProtectedRoute>
+      } />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>
