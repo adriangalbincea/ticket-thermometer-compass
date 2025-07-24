@@ -63,7 +63,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
           <h2 className="text-2xl font-bold text-foreground mb-2">Thank You!</h2>
           <p className="text-muted-foreground mb-4">Your feedback has been successfully submitted.</p>
           <p className="text-muted-foreground text-sm">
-            Redirecting to WiseServe in {countdown} second{countdown !== 1 ? 's' : ''}...
+            Redirecting to Wiseserve website in {countdown} second{countdown !== 1 ? 's' : ''}...
           </p>
         </CardContent>
       </Card>
