@@ -94,7 +94,7 @@ export const LinkGenerator: React.FC = () => {
   };
 
   const copyToClipboard = (token: string) => {
-    const url = `${window.location.origin}/feedback?token=${token}`;
+    const url = `${window.location.origin}/feedback/${token}`;
     navigator.clipboard.writeText(url);
     toast({
       title: "Copied!",
@@ -103,7 +103,7 @@ export const LinkGenerator: React.FC = () => {
   };
 
   const openLink = (token: string) => {
-    const url = `${window.location.origin}/feedback?token=${token}`;
+    const url = `${window.location.origin}/feedback/${token}`;
     window.open(url, '_blank');
   };
 

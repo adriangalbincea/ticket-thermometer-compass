@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Users, UserPlus, Edit, Trash2 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Users, UserPlus, Edit, Trash2, Copy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -25,6 +26,8 @@ export const UserManagement: React.FC = () => {
   const [newUser, setNewUser] = useState({ email: '', full_name: '', role: 'user' });
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [tempPassword, setTempPassword] = useState('');
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const { toast } = useToast();
 
   const loadUsers = async () => {
@@ -63,12 +66,12 @@ export const UserManagement: React.FC = () => {
       }
 
       // Generate a temporary password
-      const tempPassword = Math.random().toString(36).slice(-8) + 'A1!';
+      const generatedPassword = Math.random().toString(36).slice(-8) + 'A1!';
       
       const { data, error } = await supabase.functions.invoke('create-user', {
         body: {
           email: newUser.email,
-          password: tempPassword,
+          password: generatedPassword,
           full_name: newUser.full_name,
           role: newUser.role
         }
@@ -78,14 +81,14 @@ export const UserManagement: React.FC = () => {
         throw error;
       }
 
-      toast({
-        title: "User Created",
-        description: `User created successfully. Temporary password: ${tempPassword}`,
-      });
+      // Show password dialog
+      setTempPassword(generatedPassword);
+      setShowPasswordDialog(true);
       
-      loadUsers();
+      // Reset form and reload users
       setNewUser({ email: '', full_name: '', role: 'user' });
       setIsDialogOpen(false);
+      loadUsers(); // Refresh the user list
     } catch (error: any) {
       toast({
         title: "Error",
@@ -93,6 +96,14 @@ export const UserManagement: React.FC = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const copyPassword = () => {
+    navigator.clipboard.writeText(tempPassword);
+    toast({
+      title: "Copied!",
+      description: "Temporary password copied to clipboard.",
+    });
   };
 
   const handleUpdateUser = async (userId: string, updates: Partial<User>) => {
@@ -320,6 +331,30 @@ export const UserManagement: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Password Dialog */}
+      <AlertDialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>User Created Successfully</AlertDialogTitle>
+            <AlertDialogDescription>
+              The user has been created with a temporary password. Please share this password securely with the user.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="p-4 bg-muted rounded-lg font-mono text-sm">
+            {tempPassword}
+          </div>
+          <AlertDialogFooter>
+            <Button variant="outline" onClick={copyPassword}>
+              <Copy className="h-4 w-4 mr-2" />
+              Copy Password
+            </Button>
+            <AlertDialogAction onClick={() => setShowPasswordDialog(false)}>
+              Close
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
