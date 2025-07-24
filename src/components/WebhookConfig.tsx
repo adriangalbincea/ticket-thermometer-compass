@@ -16,6 +16,12 @@ export const WebhookConfig: React.FC = () => {
   const [isEnabled, setIsEnabled] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [sampleCopied, setSampleCopied] = useState(false);
+  const [settings, setSettings] = useState({
+    webhookUrl,
+    isEnabled,
+    emailNotifications
+  });
   const { toast } = useToast();
 
   const handleCopy = async (text: string) => {
@@ -32,14 +38,59 @@ export const WebhookConfig: React.FC = () => {
     }
   };
 
-  const testWebhook = () => {
-    toast({
-      title: "Webhook Test Sent",
-      description: "A test payload has been sent to your webhook endpoint.",
-    });
+  const handleSampleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setSampleCopied(true);
+      setTimeout(() => setSampleCopied(false), 2000);
+      toast({
+        title: "Copied to clipboard",
+        description: "Sample payload has been copied.",
+      });
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
+
+  const testWebhook = async () => {
+    try {
+      const response = await fetch('/functions/v1/generate-feedback-link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ticket_number: 'TEST-001',
+          technician: 'Test Technician',
+          ticket_title: 'Test webhook functionality',
+          customer_email: 'test@example.com'
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        toast({
+          title: "Webhook Test Successful",
+          description: `Test link created: ${data.feedback_url}`,
+        });
+      } else {
+        throw new Error('Webhook test failed');
+      }
+    } catch (error) {
+      toast({
+        title: "Webhook Test Failed",
+        description: "Could not connect to webhook endpoint.",
+        variant: "destructive",
+      });
+    }
   };
 
   const saveSettings = () => {
+    setSettings({
+      webhookUrl,
+      isEnabled,
+      emailNotifications
+    });
     toast({
       title: "Settings Saved",
       description: "Your webhook configuration has been updated.",
@@ -151,9 +202,9 @@ export const WebhookConfig: React.FC = () => {
               <Button 
                 variant="outline" 
                 className="mt-4"
-                onClick={() => handleCopy(JSON.stringify(samplePayload, null, 2))}
+                onClick={() => handleSampleCopy(JSON.stringify(samplePayload, null, 2))}
               >
-                <Copy className="h-4 w-4 mr-2" />
+                {sampleCopied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
                 Copy Sample Payload
               </Button>
             </CardContent>

@@ -56,7 +56,10 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
         <CardContent className="p-8 text-center">
           <CheckCircle className="h-16 w-16 text-feedback-happy mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-foreground mb-2">Thank You!</h2>
-          <p className="text-muted-foreground">Your feedback has been successfully submitted.</p>
+          <p className="text-muted-foreground mb-6">Your feedback has been successfully submitted.</p>
+          <Button onClick={() => window.close()} variant="outline">
+            Close Window
+          </Button>
         </CardContent>
       </Card>
     );
@@ -76,16 +79,18 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
       <CardContent className="p-6">
         {/* Ticket Information */}
         <div className="bg-muted rounded-lg p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div>
-              <span className="font-medium text-foreground">Ticket:</span>
-              <Badge variant="outline" className="ml-2">{ticketNumber}</Badge>
+          <div className="grid grid-cols-1 gap-4 text-sm">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <span className="font-medium text-foreground">Ticket:</span>
+                <Badge variant="outline" className="ml-2">{ticketNumber}</Badge>
+              </div>
+              <div>
+                <span className="font-medium text-foreground">Technician:</span>
+                <span className="ml-2 text-muted-foreground">{technician}</span>
+              </div>
             </div>
             <div>
-              <span className="font-medium text-foreground">Technician:</span>
-              <span className="ml-2 text-muted-foreground">{technician}</span>
-            </div>
-            <div className="md:col-span-1">
               <span className="font-medium text-foreground">Issue:</span>
               <span className="ml-2 text-muted-foreground">{ticketTitle}</span>
             </div>

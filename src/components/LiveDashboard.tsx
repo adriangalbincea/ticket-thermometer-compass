@@ -146,7 +146,35 @@ export const LiveDashboard: React.FC = () => {
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
-          <Button className="bg-gradient-primary" size="sm">
+          <Button 
+            className="bg-gradient-primary" 
+            size="sm"
+            onClick={() => {
+              const csvData = filteredData.map(item => ({
+                'Ticket Number': item.ticket_number,
+                'Customer': item.customer_name || 'Anonymous',
+                'Technician': item.technician,
+                'Issue': item.ticket_title,
+                'Feedback': item.feedback_type,
+                'Comment': item.comment || 'No comment',
+                'Date': new Date(item.submitted_at).toLocaleDateString()
+              }));
+              
+              const headers = Object.keys(csvData[0] || {});
+              const csvContent = [
+                headers.join(','),
+                ...csvData.map(row => headers.map(header => `"${row[header]}"`).join(','))
+              ].join('\n');
+              
+              const blob = new Blob([csvContent], { type: 'text/csv' });
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'feedback-export.csv';
+              a.click();
+              window.URL.revokeObjectURL(url);
+            }}
+          >
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
@@ -203,7 +231,7 @@ export const LiveDashboard: React.FC = () => {
       {/* Charts */}
       {totalFeedback > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="shadow-card">
+          <Card className="shadow-card cursor-pointer hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle>Feedback Distribution</CardTitle>
             </CardHeader>
@@ -220,7 +248,7 @@ export const LiveDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="shadow-card">
+          <Card className="shadow-card cursor-pointer hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle>Satisfaction Breakdown</CardTitle>
             </CardHeader>
@@ -249,7 +277,7 @@ export const LiveDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Feedback Records */}
+      {/* Feedback Records - Moved to top */}
       <Card className="shadow-elegant">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
