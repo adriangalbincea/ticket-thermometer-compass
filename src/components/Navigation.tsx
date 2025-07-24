@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { BarChart3, MessageSquare, Settings, Home, LogOut, LogIn } from 'lucide-react';
+import { BarChart3, MessageSquare, Settings, Home, LogOut, LogIn, User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -42,6 +42,7 @@ export const Navigation: React.FC = () => {
   const protectedNavItems = [
     { path: '/admin', label: 'Dashboard', icon: Home },
     { path: '/generate-links', label: 'Generate Links', icon: MessageSquare },
+    { path: '/profile', label: 'Profile', icon: User },
     ...(userRole === 'admin' ? [{ path: '/config', label: 'Configuration', icon: Settings }] : [])
   ];
 
