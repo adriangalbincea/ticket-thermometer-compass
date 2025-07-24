@@ -57,8 +57,11 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
           <CheckCircle className="h-16 w-16 text-feedback-happy mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-foreground mb-2">Thank You!</h2>
           <p className="text-muted-foreground mb-6">Your feedback has been successfully submitted.</p>
-          <Button onClick={() => window.close()} variant="outline">
-            Close Window
+          <Button 
+            onClick={() => window.location.href = 'https://wiseserve.net'} 
+            variant="outline"
+          >
+            Return to WiseServe
           </Button>
         </CardContent>
       </Card>

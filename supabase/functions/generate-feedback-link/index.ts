@@ -74,19 +74,21 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const feedbackUrl = `${req.headers.get('origin') || 'https://iaiennljjjvstovtpdhw.supabase.co'}/feedback/${token}`;
+    const feedbackUrl = `${req.headers.get('origin') || 'https://your-domain.com'}/feedback/${token}`;
 
     console.log('Successfully created feedback link:', { token, feedbackUrl });
 
     return new Response(
       JSON.stringify({
         success: true,
-        token,
-        feedback_url: feedbackUrl,
-        expires_hours,
-        ticket_number,
-        technician,
-        ticket_title
+        data: {
+          token,
+          feedback_url: feedbackUrl,
+          ticket_number,
+          technician,
+          ticket_title,
+          expires_in_hours: expires_hours
+        }
       }),
       {
         status: 200,
