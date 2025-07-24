@@ -87,7 +87,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
           <div className="grid grid-cols-1 gap-4 text-sm">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <span className="font-medium text-foreground">Ticket:</span>
+                <span className="font-medium text-foreground">Ticket Number:</span>
                 <Badge variant="outline" className="ml-2">{ticketNumber}</Badge>
               </div>
               <div>

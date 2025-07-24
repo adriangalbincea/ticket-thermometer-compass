@@ -472,6 +472,7 @@ export const LiveDashboard: React.FC = () => {
                 <TableRow>
                   <TableHead>Ticket</TableHead>
                   <TableHead>Customer</TableHead>
+                  <TableHead>Email</TableHead>
                   <TableHead>Technician</TableHead>
                   <TableHead>Issue</TableHead>
                   <TableHead>Feedback</TableHead>
@@ -482,7 +483,7 @@ export const LiveDashboard: React.FC = () => {
               <TableBody>
                 {filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                       {totalFeedback === 0 ? "No feedback submitted yet" : "No feedback matches your filters"}
                     </TableCell>
                   </TableRow>
@@ -491,6 +492,7 @@ export const LiveDashboard: React.FC = () => {
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">{item.ticket_number}</TableCell>
                       <TableCell>{item.customer_name || 'Anonymous'}</TableCell>
+                      <TableCell>{item.customer_email || 'N/A'}</TableCell>
                       <TableCell>{item.technician}</TableCell>
                       <TableCell>{item.ticket_title}</TableCell>
                       <TableCell>
