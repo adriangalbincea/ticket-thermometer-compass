@@ -43,12 +43,11 @@ export const TwoFactorGuard: React.FC<TwoFactorGuardProps> = ({ children }) => {
 
             console.log('TwoFactorGuard: User 2FA data:', userTwoFA);
 
-            if (userTwoFA?.is_enabled) {
-              console.log('TwoFactorGuard: Showing 2FA prompt');
-              setNeedsTwoFA(true);
-              setLoading(false);
-              return;
-            }
+            // If 2FA is required, user must either have it enabled or needs to set it up
+            console.log('TwoFactorGuard: Showing 2FA prompt/setup');
+            setNeedsTwoFA(true);
+            setLoading(false);
+            return;
           }
         }
         

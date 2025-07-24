@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Shield, AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { TwoFactorSetup } from './TwoFactorSetup';
 
 interface TwoFactorPromptProps {
   onSuccess: () => void;
@@ -17,7 +18,30 @@ export const TwoFactorPrompt: React.FC<TwoFactorPromptProps> = ({ onSuccess, onC
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [useBackupCode, setUseBackupCode] = useState(false);
+  const [needsSetup, setNeedsSetup] = useState<boolean | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const checkTwoFAStatus = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: userTwoFA } = await supabase
+          .from('user_2fa')
+          .select('is_enabled')
+          .eq('user_id', user.id)
+          .single();
+
+        setNeedsSetup(!userTwoFA?.is_enabled);
+      } catch (error) {
+        console.error('Error checking 2FA status:', error);
+        setNeedsSetup(true); // Default to setup if there's an error
+      }
+    };
+
+    checkTwoFAStatus();
+  }, []);
 
   const verifyCode = async () => {
     if (!code || code.length < 6) {
@@ -96,6 +120,31 @@ export const TwoFactorPrompt: React.FC<TwoFactorPromptProps> = ({ onSuccess, onC
     }
   };
 
+  // Show loading while checking setup status
+  if (needsSetup === null) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-lg">Checking 2FA status...</div>
+      </div>
+    );
+  }
+
+  // Show setup component if 2FA is not configured
+  if (needsSetup) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center py-8 px-4">
+        <TwoFactorSetup 
+          onComplete={() => {
+            setNeedsSetup(false);
+            onSuccess();
+          }}
+          onCancel={onCancel}
+        />
+      </div>
+    );
+  }
+
+  // Show verification component if 2FA is already configured
   return (
     <div className="min-h-screen bg-background flex items-center justify-center py-8 px-4">
       <Card className="w-full max-w-md">
