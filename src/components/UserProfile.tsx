@@ -8,17 +8,20 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { User, Lock, Check, X } from 'lucide-react';
+import { User, Lock, Check, X, Edit2, Save, X as Cancel } from 'lucide-react';
 
 export const UserProfile: React.FC = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState<{ full_name: string } | null>(null);
+  const [editingName, setEditingName] = useState(false);
+  const [newName, setNewName] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [nameLoading, setNameLoading] = useState(false);
 
   // Fetch user profile data
   useEffect(() => {
@@ -36,6 +39,8 @@ export const UserProfile: React.FC = () => {
           console.error('Error fetching user profile:', error);
         } else {
           setUserProfile(data);
+          // Set initial name for editing (excluding email addresses)
+          setNewName(data?.full_name && data.full_name !== user?.email ? data.full_name : '');
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
@@ -55,6 +60,56 @@ export const UserProfile: React.FC = () => {
 
   const isPasswordValid = Object.values(passwordRequirements).every(Boolean);
   const passwordsMatch = newPassword === confirmPassword;
+
+  // Helper function to determine if full_name is actually a name or just email
+  const getDisplayName = () => {
+    if (!userProfile?.full_name || userProfile.full_name === user?.email) {
+      return 'Not set';
+    }
+    return userProfile.full_name;
+  };
+
+  const handleNameUpdate = async () => {
+    if (!newName.trim()) {
+      toast({
+        title: "Invalid Name",
+        description: "Please enter a valid name.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setNameLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ full_name: newName.trim() })
+        .eq('id', user?.id);
+
+      if (error) {
+        toast({
+          title: "Update Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        setUserProfile({ full_name: newName.trim() });
+        setEditingName(false);
+        toast({
+          title: "Name Updated",
+          description: "Your name has been updated successfully.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setNameLoading(false);
+    }
+  };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,7 +186,49 @@ export const UserProfile: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Name</Label>
-              <Input value={userProfile?.full_name || 'Not set'} disabled />
+              <div className="flex items-center gap-2">
+                {editingName ? (
+                  <>
+                    <Input
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      placeholder="Enter your name"
+                      className="flex-1"
+                    />
+                    <Button
+                      size="sm"
+                      onClick={handleNameUpdate}
+                      disabled={nameLoading || !newName.trim()}
+                      className="px-3"
+                    >
+                      <Save className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setEditingName(false);
+                        setNewName(userProfile?.full_name && userProfile.full_name !== user?.email ? userProfile.full_name : '');
+                      }}
+                      className="px-3"
+                    >
+                      <Cancel className="h-4 w-4" />
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Input value={getDisplayName()} disabled className="flex-1" />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setEditingName(true)}
+                      className="px-3"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
             <div className="space-y-2">
               <Label>Email</Label>
