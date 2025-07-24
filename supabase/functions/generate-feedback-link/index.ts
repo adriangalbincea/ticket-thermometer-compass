@@ -64,6 +64,45 @@ serve(async (req) => {
   console.log('Processing POST request...');
 
   try {
+    // Validate API secret token
+    const authHeader = req.headers.get('authorization');
+    const apiSecretToken = Deno.env.get('API_SECRET_TOKEN');
+    
+    if (!apiSecretToken) {
+      console.error('API_SECRET_TOKEN not configured');
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }),
+        { 
+          status: 500, 
+          headers: { 'Content-Type': 'application/json', ...corsHeaders } 
+        }
+      );
+    }
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('Missing or invalid authorization header');
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header. Include: Authorization: Bearer YOUR_TOKEN' }),
+        { 
+          status: 401, 
+          headers: { 'Content-Type': 'application/json', ...corsHeaders } 
+        }
+      );
+    }
+    
+    const providedToken = authHeader.substring(7); // Remove 'Bearer ' prefix
+    if (providedToken !== apiSecretToken) {
+      console.log('Invalid API token provided');
+      return new Response(
+        JSON.stringify({ error: 'Invalid API token' }),
+        { 
+          status: 401, 
+          headers: { 'Content-Type': 'application/json', ...corsHeaders } 
+        }
+      );
+    }
+    
+    console.log('API token validated successfully');
     console.log('Starting feedback link generation...');
     
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
