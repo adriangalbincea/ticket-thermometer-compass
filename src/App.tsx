@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { RoleBasedAccess } from "@/components/RoleBasedAccess";
 import Feedback from "./pages/Feedback";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
@@ -37,12 +38,16 @@ const AppRoutes = () => {
       <Route path="/feedback/:token" element={<Feedback />} />
       <Route path="/config" element={
         <ProtectedRoute>
-          <Config />
+          <RoleBasedAccess allowedRoles={['admin']} fallback={<Navigate to="/admin" replace />}>
+            <Config />
+          </RoleBasedAccess>
         </ProtectedRoute>
       } />
       <Route path="/api-test-guide" element={
         <ProtectedRoute>
-          <ApiTestGuide />
+          <RoleBasedAccess allowedRoles={['admin']} fallback={<Navigate to="/admin" replace />}>
+            <ApiTestGuide />
+          </RoleBasedAccess>
         </ProtectedRoute>
       } />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
