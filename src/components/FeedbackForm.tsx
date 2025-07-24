@@ -16,9 +16,9 @@ interface FeedbackFormProps {
 }
 
 export const FeedbackForm: React.FC<FeedbackFormProps> = ({
-  ticketNumber = "TK-2024-001",
-  technician = "John Smith",
-  ticketTitle = "Network connectivity issue resolved",
+  ticketNumber,
+  technician,
+  ticketTitle,
   onSubmit
 }) => {
   const [selectedFeedback, setSelectedFeedback] = useState<FeedbackType | null>(null);

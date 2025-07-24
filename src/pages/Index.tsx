@@ -26,7 +26,7 @@ const Index = () => {
               <NavLink to="/feedback">Try Demo Feedback</NavLink>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <NavLink to="/admin">View Dashboard</NavLink>
+              <NavLink to="/auth">Admin Login</NavLink>
             </Button>
           </div>
         </div>
