@@ -81,9 +81,26 @@ export const UserManagement: React.FC = () => {
         throw error;
       }
 
-      // Show password dialog
+      // Check if user already exists (success with warning)
+      if (data?.warning) {
+        toast({
+          title: "Warning",
+          description: data.warning,
+          variant: "destructive",
+        });
+        setNewUser({ email: '', full_name: '', role: 'user' });
+        setIsDialogOpen(false);
+        return;
+      }
+
+      // Show password dialog for new user
       setTempPassword(generatedPassword);
       setShowPasswordDialog(true);
+      
+      toast({
+        title: "Success",
+        description: "User created successfully!",
+      });
       
       // Reset form and reload users
       setNewUser({ email: '', full_name: '', role: 'user' });
