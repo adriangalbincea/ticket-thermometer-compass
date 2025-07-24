@@ -145,6 +145,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_2fa: {
+        Row: {
+          backup_codes: string[]
+          created_at: string | null
+          id: string
+          is_enabled: boolean
+          secret: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          backup_codes?: string[]
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean
+          secret: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          backup_codes?: string[]
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean
+          secret?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -165,8 +195,16 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      is_2fa_required: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
       is_admin: {
         Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      verify_totp_token: {
+        Args: { user_id: string; token: string }
         Returns: boolean
       }
     }

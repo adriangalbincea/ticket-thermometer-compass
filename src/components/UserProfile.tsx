@@ -9,12 +9,13 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { User, Lock, Check, X, Edit2, Save, X as Cancel } from 'lucide-react';
+import { TwoFactorManagement } from './TwoFactorManagement';
 
 export const UserProfile: React.FC = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [userProfile, setUserProfile] = useState<{ full_name: string } | null>(null);
+  const [userProfile, setUserProfile] = useState<{ full_name: string; role?: string } | null>(null);
   const [editingName, setEditingName] = useState(false);
   const [newName, setNewName] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -31,7 +32,7 @@ export const UserProfile: React.FC = () => {
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('full_name')
+          .select('full_name, role')
           .eq('id', user.id)
           .single();
 
@@ -349,6 +350,10 @@ export const UserProfile: React.FC = () => {
           </form>
         </CardContent>
       </Card>
+
+      {/* Show 2FA Management for all users, but especially important for admins */}
+      <Separator />
+      <TwoFactorManagement />
     </div>
   );
 };

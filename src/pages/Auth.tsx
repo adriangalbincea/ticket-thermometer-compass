@@ -6,15 +6,20 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import { LogIn } from 'lucide-react';
+import { TwoFactorPrompt } from '@/components/TwoFactorPrompt';
 
 const Auth: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
+  const [show2FA, setShow2FA] = useState(false);
+  const [pendingUser, setPendingUser] = useState(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { check2FARequirement } = useAuth();
 
   useEffect(() => {
     // Check if user is already logged in
@@ -46,7 +51,7 @@ const Auth: React.FC = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -57,12 +62,43 @@ const Auth: React.FC = () => {
           description: error.message,
           variant: "destructive",
         });
-      } else {
-        toast({
-          title: "Welcome back!",
-          description: "You've been signed in successfully.",
-        });
+        return;
       }
+
+      // Check if 2FA is required for this user
+      const requires2FA = await check2FARequirement();
+      
+      if (requires2FA) {
+        // Check if user has 2FA enabled
+        const { data: userTwoFA } = await supabase
+          .from('user_2fa')
+          .select('is_enabled')
+          .eq('user_id', data.user.id)
+          .single();
+
+        if (userTwoFA?.is_enabled) {
+          // Store pending user and show 2FA prompt
+          setPendingUser(data.user);
+          setShow2FA(true);
+          
+          // Sign out temporarily until 2FA is verified
+          await supabase.auth.signOut();
+          return;
+        } else {
+          // Admin user needs to set up 2FA but hasn't yet
+          toast({
+            title: "2FA Setup Required",
+            description: "As an admin, you must set up two-factor authentication. Please go to your profile settings to enable 2FA.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
+      toast({
+        title: "Welcome back!",
+        description: "You've been signed in successfully.",
+      });
     } catch (error) {
       toast({
         title: "Error",
@@ -73,6 +109,52 @@ const Auth: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const handle2FASuccess = async () => {
+    if (!pendingUser) return;
+    
+    // Re-authenticate the user after successful 2FA
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      toast({
+        title: "Authentication error",
+        description: error.message,
+        variant: "destructive",
+      });
+      setShow2FA(false);
+      setPendingUser(null);
+      return;
+    }
+
+    setShow2FA(false);
+    setPendingUser(null);
+    
+    toast({
+      title: "Welcome back!",
+      description: "You've been signed in successfully.",
+    });
+    
+    navigate('/admin');
+  };
+
+  const handle2FACancel = async () => {
+    setShow2FA(false);
+    setPendingUser(null);
+    await supabase.auth.signOut();
+  };
+
+  if (show2FA) {
+    return (
+      <TwoFactorPrompt 
+        onSuccess={handle2FASuccess}
+        onCancel={handle2FACancel}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center py-8 px-4">

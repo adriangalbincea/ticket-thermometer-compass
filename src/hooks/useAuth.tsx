@@ -6,14 +6,18 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  requires2FA: boolean;
   signOut: () => Promise<void>;
+  check2FARequirement: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
   loading: true,
+  requires2FA: false,
   signOut: async () => {},
+  check2FARequirement: async () => false,
 });
 
 export const useAuth = () => {
@@ -28,6 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [requires2FA, setRequires2FA] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener
@@ -49,12 +54,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
+  const check2FARequirement = async (): Promise<boolean> => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+
+      const { data, error } = await supabase
+        .rpc('is_2fa_required', { user_id: user.id });
+
+      if (error) {
+        console.error('Error checking 2FA requirement:', error);
+        return false;
+      }
+
+      return data || false;
+    } catch (error) {
+      console.error('Error checking 2FA requirement:', error);
+      return false;
+    }
+  };
+
   const signOut = async () => {
+    setRequires2FA(false);
     await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, requires2FA, signOut, check2FARequirement }}>
       {children}
     </AuthContext.Provider>
   );
