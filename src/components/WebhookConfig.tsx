@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Copy, Check, Webhook, Globe, Mail, Database, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export const WebhookConfig: React.FC = () => {
   const [webhookUrl, setWebhookUrl] = useState('https://feedback.yourcompany.com/webhook/receive');
@@ -54,28 +55,21 @@ export const WebhookConfig: React.FC = () => {
 
   const testWebhook = async () => {
     try {
-      const response = await fetch('/functions/v1/generate-feedback-link', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('generate-feedback-link', {
+        body: {
           ticket_number: 'TEST-001',
-          technician: 'Test Technician',
+          technician: 'Test Technician', 
           ticket_title: 'Test webhook functionality',
           customer_email: 'test@example.com'
-        })
+        }
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        toast({
-          title: "Webhook Test Successful",
-          description: `Test link created: ${data.feedback_url}`,
-        });
-      } else {
-        throw new Error('Webhook test failed');
-      }
+      if (error) throw error;
+
+      toast({
+        title: "Webhook Test Successful",
+        description: `Test link created: ${data.feedback_url}`,
+      });
     } catch (error) {
       toast({
         title: "Webhook Test Failed",

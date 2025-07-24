@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dashboard } from '@/components/Dashboard';
 import { LinkGenerator } from '@/components/LinkGenerator';
 import { LiveDashboard } from '@/components/LiveDashboard';
-import { Home } from '@/components/Home';
+import { UserManagement } from '@/components/UserManagement';
 
 const Admin: React.FC = () => {
   return (
@@ -19,23 +19,23 @@ const Admin: React.FC = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="live" className="space-y-6">
+        <Tabs defaultValue="dashboard" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 max-w-lg mx-auto">
-            <TabsTrigger value="live">Home</TabsTrigger>
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="generate">Generate Links</TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="live" className="space-y-6">
-            <LiveDashboard />
-          </TabsContent>
-
           <TabsContent value="dashboard" className="space-y-6">
-            <Dashboard />
+            <LiveDashboard />
           </TabsContent>
 
           <TabsContent value="generate" className="space-y-6">
             <LinkGenerator />
+          </TabsContent>
+
+          <TabsContent value="users" className="space-y-6">
+            <UserManagement />
           </TabsContent>
         </Tabs>
       </div>
