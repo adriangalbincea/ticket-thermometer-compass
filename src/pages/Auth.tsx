@@ -68,9 +68,12 @@ const Auth: React.FC = () => {
       }
 
       // Check if 2FA is required for this user
+      console.log('Checking 2FA requirement...');
       const requires2FA = await check2FARequirement();
+      console.log('2FA required result:', requires2FA);
       
       if (requires2FA) {
+        console.log('2FA is required, checking if user has it enabled...');
         // Check if user has 2FA enabled
         const { data: userTwoFA } = await supabase
           .from('user_2fa')
@@ -78,7 +81,10 @@ const Auth: React.FC = () => {
           .eq('user_id', data.user.id)
           .single();
 
+        console.log('User 2FA status:', userTwoFA);
+
         if (userTwoFA?.is_enabled) {
+          console.log('User has 2FA enabled, showing prompt...');
           // Show 2FA prompt - keep user logged in
           setPendingUser(data.user);
           setShow2FA(true);
@@ -95,6 +101,8 @@ const Auth: React.FC = () => {
           setLoading(false);
           return;
         }
+      } else {
+        console.log('2FA is not required for this user');
       }
 
       // No 2FA required, proceed with normal login
