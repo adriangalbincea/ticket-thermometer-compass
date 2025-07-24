@@ -101,6 +101,12 @@ export const TwoFactorPrompt: React.FC<TwoFactorPromptProps> = ({ onSuccess, onC
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !loading && code) {
+      verifyCode();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center py-8 px-4">
       <Card className="w-full max-w-md">
@@ -133,8 +139,10 @@ export const TwoFactorPrompt: React.FC<TwoFactorPromptProps> = ({ onSuccess, onC
                   : e.target.value.replace(/\D/g, '').slice(0, 6);
                 setCode(value);
               }}
+              onKeyDown={handleKeyDown}
               className="text-center text-lg font-mono tracking-widest"
               maxLength={useBackupCode ? 8 : 6}
+              autoFocus
             />
           </div>
 
