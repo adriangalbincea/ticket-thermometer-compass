@@ -40,7 +40,8 @@ export const Navigation: React.FC = () => {
   const publicNavItems: any[] = [];
 
   const protectedNavItems = [
-    { path: '/admin', label: 'Home', icon: Home },
+    { path: '/admin', label: 'Dashboard', icon: Home },
+    { path: '/generate-links', label: 'Generate Links', icon: MessageSquare },
     ...(userRole === 'admin' ? [{ path: '/config', label: 'Configuration', icon: Settings }] : [])
   ];
 

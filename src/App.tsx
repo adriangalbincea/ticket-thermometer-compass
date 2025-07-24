@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { RoleBasedAccess } from "@/components/RoleBasedAccess";
+import GenerateLinks from "./pages/GenerateLinks";
 import Feedback from "./pages/Feedback";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
@@ -36,6 +37,11 @@ const AppRoutes = () => {
         </ProtectedRoute>
       } />
       <Route path="/feedback/:token" element={<Feedback />} />
+      <Route path="/generate-links" element={
+        <ProtectedRoute>
+          <GenerateLinks />
+        </ProtectedRoute>
+      } />
       <Route path="/config" element={
         <ProtectedRoute>
           <RoleBasedAccess allowedRoles={['admin']} fallback={<Navigate to="/admin" replace />}>

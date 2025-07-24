@@ -213,7 +213,13 @@ export const LiveDashboard: React.FC = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="shadow-elegant">
+        <Card className="shadow-elegant cursor-pointer hover:shadow-card transition-shadow duration-200" onClick={() => {
+          // No specific filter for total feedback
+          toast({
+            title: "Total Feedback",
+            description: "Showing all feedback responses",
+          });
+        }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Feedback</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -224,7 +230,13 @@ export const LiveDashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="shadow-elegant">
+        <Card className="shadow-elegant cursor-pointer hover:shadow-card transition-shadow duration-200" onClick={() => {
+          setSelectedFeedback('happy');
+          toast({
+            title: "Filter Applied",
+            description: `Showing Happy feedback only (${satisfactionRate}% satisfaction rate)`,
+          });
+        }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Satisfaction Rate</CardTitle>
             <Star className="h-4 w-4 text-muted-foreground" />
@@ -235,7 +247,13 @@ export const LiveDashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="shadow-elegant">
+        <Card className="shadow-elegant cursor-pointer hover:shadow-card transition-shadow duration-200" onClick={() => {
+          setSelectedFeedback('bad');
+          toast({
+            title: "Filter Applied",
+            description: `Showing Unhappy feedback only`,
+          });
+        }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Unhappy Responses</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -246,7 +264,13 @@ export const LiveDashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="shadow-elegant">
+        <Card className="shadow-elegant cursor-pointer hover:shadow-card transition-shadow duration-200" onClick={() => {
+          // No specific filter for technicians
+          toast({
+            title: "Active Technicians",
+            description: `${uniqueTechnicians.length} technicians are handling tickets`,
+          });
+        }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Technicians</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
