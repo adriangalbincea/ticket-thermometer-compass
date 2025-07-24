@@ -134,7 +134,16 @@ const Feedback: React.FC = () => {
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="container mx-auto">
-        <div className="py-8">
+        {/* WiseServe Logo */}
+        <div className="text-center mb-8">
+          <img 
+            src="/lovable-uploads/00a9f4fc-8ab5-4dd4-85ff-7abd95d3761e.png" 
+            alt="WiseServe Logo" 
+            className="h-12 mx-auto mb-4"
+          />
+        </div>
+        
+        <div className="py-4">
           <FeedbackForm
             ticketNumber={feedbackLink?.ticket_number}
             technician={feedbackLink?.technician}

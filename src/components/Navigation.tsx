@@ -52,7 +52,15 @@ export const Navigation: React.FC = () => {
     <Card className="mb-6 shadow-elegant">
       <CardContent className="p-4">
         <nav className="flex flex-wrap justify-between items-center">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-4">
+            {/* WiseServe Logo */}
+            <img 
+              src="/lovable-uploads/a731101c-1c01-4a4d-b918-86bf17193d27.png" 
+              alt="WiseServe" 
+              className="h-8 w-8"
+            />
+            
+            <div className="flex flex-wrap gap-2">
             {publicNavItems.map(({ path, label, icon: Icon }) => (
               <Button
                 key={path}
@@ -80,6 +88,7 @@ export const Navigation: React.FC = () => {
                 </NavLink>
               </Button>
             ))}
+            </div>
           </div>
 
           <div className="flex items-center gap-2 mt-2 sm:mt-0">

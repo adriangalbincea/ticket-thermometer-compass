@@ -131,11 +131,19 @@ const Auth: React.FC = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center py-8 px-4">
       <div className="w-full max-w-md">
+        {/* WiseServe Logo */}
+        <div className="text-center mb-8">
+          <img 
+            src="/lovable-uploads/00a9f4fc-8ab5-4dd4-85ff-7abd95d3761e.png" 
+            alt="WiseServe Logo" 
+            className="h-16 mx-auto mb-4"
+          />
+        </div>
 
         <Card className="shadow-elegant">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">Customer Thermometer</CardTitle>
-            <p className="text-muted-foreground">Sign in to access the admin dashboard</p>
+            <CardTitle className="text-2xl font-bold">Admin Portal</CardTitle>
+            <p className="text-muted-foreground">Sign in to access the feedback dashboard</p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSignIn} className="space-y-4">
