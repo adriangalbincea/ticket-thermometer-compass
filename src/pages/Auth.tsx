@@ -131,14 +131,6 @@ const Auth: React.FC = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center py-8 px-4">
       <div className="w-full max-w-md">
-        <div className="mb-6">
-          <Button variant="ghost" asChild className="mb-4">
-            <NavLink to="/">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </NavLink>
-          </Button>
-        </div>
 
         <Card className="shadow-elegant">
           <CardHeader className="text-center">

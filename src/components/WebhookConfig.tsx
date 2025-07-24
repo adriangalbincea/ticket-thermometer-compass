@@ -65,7 +65,7 @@ export const WebhookConfig: React.FC = () => {
       </div>
 
       <Tabs defaultValue="webhook" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="webhook" className="flex items-center gap-2">
             <Webhook className="h-4 w-4" />
             Webhook
@@ -73,10 +73,6 @@ export const WebhookConfig: React.FC = () => {
           <TabsTrigger value="email" className="flex items-center gap-2">
             <Mail className="h-4 w-4" />
             Email
-          </TabsTrigger>
-          <TabsTrigger value="database" className="flex items-center gap-2">
-            <Database className="h-4 w-4" />
-            Database
           </TabsTrigger>
           <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
@@ -219,58 +215,6 @@ export const WebhookConfig: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="database" className="space-y-6">
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5" />
-                Database Configuration
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="db-host">MariaDB Host</Label>
-                  <Input id="db-host" placeholder="localhost" />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="db-port">Port</Label>
-                    <Input id="db-port" placeholder="3306" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="db-name">Database Name</Label>
-                    <Input id="db-name" placeholder="customer_feedback" />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="db-user">Username</Label>
-                    <Input id="db-user" placeholder="feedback_user" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="db-password">Password</Label>
-                    <Input id="db-password" type="password" placeholder="••••••••" />
-                  </div>
-                </div>
-              </div>
-
-              <Alert>
-                <Database className="h-4 w-4" />
-                <AlertDescription>
-                  Ensure your MariaDB instance is accessible and the user has appropriate permissions to create tables and insert data.
-                </AlertDescription>
-              </Alert>
-
-              <div className="flex gap-4">
-                <Button variant="outline">Test Connection</Button>
-                <Button className="bg-gradient-primary">Save Database Settings</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">
           <Card className="shadow-card">

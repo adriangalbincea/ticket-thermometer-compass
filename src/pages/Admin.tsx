@@ -19,16 +19,15 @@ const Admin: React.FC = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="home" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 max-w-lg mx-auto">
-            <TabsTrigger value="home">Home</TabsTrigger>
-            <TabsTrigger value="dashboard">Overview</TabsTrigger>
+        <Tabs defaultValue="live" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 max-w-lg mx-auto">
+            <TabsTrigger value="live">Home</TabsTrigger>
+            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="generate">Generate Links</TabsTrigger>
-            <TabsTrigger value="live">Live Dashboard</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="home" className="space-y-6">
-            <Home />
+          <TabsContent value="live" className="space-y-6">
+            <LiveDashboard />
           </TabsContent>
 
           <TabsContent value="dashboard" className="space-y-6">
@@ -37,10 +36,6 @@ const Admin: React.FC = () => {
 
           <TabsContent value="generate" className="space-y-6">
             <LinkGenerator />
-          </TabsContent>
-
-          <TabsContent value="live" className="space-y-6">
-            <LiveDashboard />
           </TabsContent>
         </Tabs>
       </div>

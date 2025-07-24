@@ -11,13 +11,10 @@ export const Navigation: React.FC = () => {
   
   const isActive = (path: string) => location.pathname === path;
   
-  const publicNavItems = [
-    { path: '/', label: 'Home', icon: Home },
-    { path: '/feedback', label: 'Feedback Form', icon: MessageSquare },
-  ];
+  const publicNavItems: any[] = [];
 
   const protectedNavItems = [
-    { path: '/admin', label: 'Dashboard', icon: BarChart3 },
+    { path: '/admin', label: 'Home', icon: Home },
     { path: '/config', label: 'Configuration', icon: Settings },
   ];
 
