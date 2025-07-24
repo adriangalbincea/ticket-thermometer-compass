@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +21,7 @@ const Auth: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { check2FARequirement } = useAuth();
+  const checking2FARef = useRef(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -37,12 +38,15 @@ const Auth: React.FC = () => {
     // Listen for auth changes - but don't navigate automatically
     // Let the component handle navigation based on 2FA requirements
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event, 'checking2FA:', checking2FA);
+      console.log('Auth state change:', event, 'checking2FA ref:', checking2FARef.current);
       if (session?.user) {
         setUser(session.user);
         // Only navigate if we're not checking 2FA
-        if (!checking2FA && !show2FA) {
+        if (!checking2FARef.current && !show2FA) {
+          console.log('Navigating to admin...');
           navigate('/admin');
+        } else {
+          console.log('Not navigating - checking2FA or show2FA is true');
         }
       } else {
         setUser(null);
@@ -56,6 +60,7 @@ const Auth: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setChecking2FA(true);
+    checking2FARef.current = true;
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -98,6 +103,7 @@ const Auth: React.FC = () => {
           console.log('Called setShow2FA(true)');
           setLoading(false);
           setChecking2FA(false);
+          checking2FARef.current = false;
           return;
         } else {
           // Admin user needs to set up 2FA but hasn't yet
@@ -109,11 +115,13 @@ const Auth: React.FC = () => {
           });
           setLoading(false);
           setChecking2FA(false);
+          checking2FARef.current = false;
           return;
         }
       } else {
         console.log('2FA is not required for this user');
         setChecking2FA(false);
+        checking2FARef.current = false;
       }
 
       // No 2FA required, proceed with normal login
@@ -133,6 +141,7 @@ const Auth: React.FC = () => {
     } finally {
       setLoading(false);
       setChecking2FA(false);
+      checking2FARef.current = false;
     }
   };
 
