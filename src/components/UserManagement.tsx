@@ -53,13 +53,39 @@ export const UserManagement: React.FC = () => {
 
   const handleCreateUser = async () => {
     try {
-      // Note: This would typically require admin auth functions
-      // For now, we'll just show a message that this needs backend implementation
-      toast({
-        title: "Feature Not Implemented",
-        description: "User creation requires additional backend setup with admin functions.",
-        variant: "destructive",
+      if (!newUser.email || !newUser.full_name) {
+        toast({
+          title: "Error",
+          description: "Email and full name are required.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Generate a temporary password
+      const tempPassword = Math.random().toString(36).slice(-8) + 'A1!';
+      
+      const { data, error } = await supabase.functions.invoke('create-user', {
+        body: {
+          email: newUser.email,
+          password: tempPassword,
+          full_name: newUser.full_name,
+          role: newUser.role
+        }
       });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "User Created",
+        description: `User created successfully. Temporary password: ${tempPassword}`,
+      });
+      
+      loadUsers();
+      setNewUser({ email: '', full_name: '', role: 'user' });
+      setIsDialogOpen(false);
     } catch (error: any) {
       toast({
         title: "Error",

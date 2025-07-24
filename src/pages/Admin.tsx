@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dashboard } from '@/components/Dashboard';
 import { LinkGenerator } from '@/components/LinkGenerator';
 import { LiveDashboard } from '@/components/LiveDashboard';
-import { UserManagement } from '@/components/UserManagement';
 
 const Admin: React.FC = () => {
   return (
@@ -20,10 +19,9 @@ const Admin: React.FC = () => {
         </div>
 
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-lg mx-auto">
+          <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="generate">Generate Links</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard" className="space-y-6">
@@ -32,10 +30,6 @@ const Admin: React.FC = () => {
 
           <TabsContent value="generate" className="space-y-6">
             <LinkGenerator />
-          </TabsContent>
-
-          <TabsContent value="users" className="space-y-6">
-            <UserManagement />
           </TabsContent>
         </Tabs>
       </div>

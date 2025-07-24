@@ -31,6 +31,7 @@ export const LiveDashboard: React.FC = () => {
   const { toast } = useToast();
 
   const loadFeedbackData = async () => {
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('feedback_submissions')

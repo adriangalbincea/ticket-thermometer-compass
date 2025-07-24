@@ -50,3 +50,6 @@ enable_confirmations = false
 
 [functions.generate-feedback-link]
 verify_jwt = false
+
+[functions.create-user]
+verify_jwt = true
