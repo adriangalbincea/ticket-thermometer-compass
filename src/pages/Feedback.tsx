@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { FeedbackForm, FeedbackType } from '@/components/FeedbackForm';
-import { Navigation } from '@/components/Navigation';
-import { useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 
 const Feedback: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const { token } = useParams<{ token: string }>();
   const [feedbackLink, setFeedbackLink] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
-  
-  // Extract token from URL
-  const token = searchParams.get('token');
 
   useEffect(() => {
     const loadFeedbackLink = async () => {
@@ -105,7 +101,6 @@ const Feedback: React.FC = () => {
     return (
       <div className="min-h-screen bg-background py-8 px-4">
         <div className="container mx-auto">
-          <Navigation />
           <div className="py-8 flex justify-center">
             <Card className="shadow-elegant">
               <CardContent className="p-8 text-center">
@@ -123,7 +118,6 @@ const Feedback: React.FC = () => {
     return (
       <div className="min-h-screen bg-background py-8 px-4">
         <div className="container mx-auto">
-          <Navigation />
           <div className="py-8 flex justify-center">
             <Card className="shadow-elegant">
               <CardContent className="p-8 text-center">
@@ -140,7 +134,6 @@ const Feedback: React.FC = () => {
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="container mx-auto">
-        <Navigation />
         <div className="py-8">
           <FeedbackForm
             ticketNumber={feedbackLink?.ticket_number}
