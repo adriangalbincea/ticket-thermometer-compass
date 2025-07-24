@@ -1,5 +1,5 @@
 import React from 'react';
-import { WebhookConfig } from '@/components/WebhookConfig';
+import { ApiConfig } from '@/components/ApiConfig';
 import { UserManagement } from '@/components/UserManagement';
 import { SettingsConfig } from '@/components/SettingsConfig';
 import { EmailConfig } from '@/components/EmailConfig';
@@ -15,20 +15,20 @@ const Config: React.FC = () => {
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-foreground mb-4">Configuration</h1>
           <p className="text-lg text-muted-foreground">
-            Manage system settings, webhooks, users, and email configuration
+            Manage system settings, API configuration, users, and email setup
           </p>
         </div>
 
-        <Tabs defaultValue="webhooks" className="space-y-6">
+        <Tabs defaultValue="api" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 max-w-2xl mx-auto">
-            <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
+            <TabsTrigger value="api">API</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
             <TabsTrigger value="email">Email</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="webhooks" className="space-y-6">
-            <WebhookConfig />
+          <TabsContent value="api" className="space-y-6">
+            <ApiConfig />
           </TabsContent>
 
           <TabsContent value="users" className="space-y-6">

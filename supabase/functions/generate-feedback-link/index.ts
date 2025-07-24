@@ -1,5 +1,6 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.52.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,13 +16,17 @@ interface FeedbackLinkRequest {
   expires_hours?: number;
 }
 
-const handler = async (req: Request): Promise<Response> => {
+serve(async (req) => {
+  console.log('Function called with method:', req.method);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('Handling CORS preflight');
     return new Response(null, { headers: corsHeaders });
   }
 
   if (req.method !== 'POST') {
+    console.log('Invalid method:', req.method);
     return new Response(
       JSON.stringify({ error: 'Method not allowed' }),
       { 
@@ -32,16 +37,31 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    console.log('Starting feedback link generation...');
+    
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('Missing environment variables');
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }),
+        { 
+          status: 500, 
+          headers: { 'Content-Type': 'application/json', ...corsHeaders } 
+        }
+      );
+    }
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const body: FeedbackLinkRequest = await req.json();
+    console.log('Request body:', body);
     
     const { ticket_number, technician, ticket_title, customer_email, customer_name, expires_hours = 72 } = body;
 
     if (!ticket_number || !technician || !ticket_title) {
+      console.log('Missing required fields');
       return new Response(
         JSON.stringify({ error: 'Missing required fields: ticket_number, technician, ticket_title' }),
         { 
@@ -64,7 +84,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (error) {
-      console.error('Error creating feedback link:', error);
+      console.error('Database error:', error);
       return new Response(
         JSON.stringify({ error: 'Failed to create feedback link: ' + error.message }),
         { 
@@ -74,7 +94,15 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const feedbackUrl = `${req.headers.get('origin') || 'https://your-domain.com'}/feedback/${token}`;
+    console.log('Generated token:', token);
+
+    // Build feedback URL
+    const origin = req.headers.get('origin') || 
+                   (req.headers.get('x-forwarded-proto') && req.headers.get('host') ? 
+                    `${req.headers.get('x-forwarded-proto')}://${req.headers.get('host')}` : 
+                    'https://your-domain.com');
+    
+    const feedbackUrl = `${origin}/feedback/${token}`;
 
     console.log('Successfully created feedback link:', { token, feedbackUrl });
 
@@ -97,15 +125,13 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
   } catch (error: any) {
-    console.error('Error in generate-feedback-link function:', error);
+    console.error('Function error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message || 'Internal server error' }),
       {
         status: 500,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       }
     );
   }
-};
-
-serve(handler);
+});
