@@ -34,18 +34,18 @@ const Auth: React.FC = () => {
 
     checkUser();
 
-    // Listen for auth changes - only navigate if not in 2FA flow
+    // Listen for auth changes - but don't navigate automatically
+    // Let the component handle navigation based on 2FA requirements
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user && !show2FA) {
+      if (session?.user) {
         setUser(session.user);
-        navigate('/admin');
-      } else if (!session?.user) {
+      } else {
         setUser(null);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, show2FA]);
+  }, [navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,6 +110,9 @@ const Auth: React.FC = () => {
         title: "Welcome back!",
         description: "You've been signed in successfully.",
       });
+      
+      // Navigate to admin since no 2FA required
+      navigate('/admin');
     } catch (error) {
       toast({
         title: "Error",
@@ -130,7 +133,8 @@ const Auth: React.FC = () => {
       description: "Two-factor authentication verified successfully.",
     });
     
-    // Let auth state listener handle navigation
+    // Navigate to admin after successful 2FA
+    navigate('/admin');
   };
 
   const handle2FACancel = async () => {
@@ -139,7 +143,10 @@ const Auth: React.FC = () => {
     await supabase.auth.signOut();
   };
 
+  console.log('Auth render - show2FA:', show2FA, 'pendingUser:', !!pendingUser);
+
   if (show2FA) {
+    console.log('Rendering 2FA prompt component');
     return (
       <TwoFactorPrompt 
         onSuccess={handle2FASuccess}
