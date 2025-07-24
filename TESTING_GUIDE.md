@@ -32,7 +32,7 @@ Expected Response:
 
 #### 2. Test with All Optional Fields
 ```bash
-curl -X POST https://feedback.wiseserve.net/functions/v1/generate-feedback-link \
+curl -X POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link \
   -H "Content-Type: application/json" \
   -d '{
     "ticket_number": "TEST-002",
@@ -46,7 +46,7 @@ curl -X POST https://feedback.wiseserve.net/functions/v1/generate-feedback-link 
 
 #### 3. Test Missing Required Fields (Error Case)
 ```bash
-curl -X POST https://feedback.wiseserve.net/functions/v1/generate-feedback-link \
+curl -X POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link \
   -H "Content-Type: application/json" \
   -d '{
     "ticket_number": "TEST-003"
@@ -62,7 +62,7 @@ Expected Response:
 
 #### 4. Test Wrong HTTP Method (Error Case)
 ```bash
-curl -X GET https://feedback.wiseserve.net/functions/v1/generate-feedback-link
+curl -X GET https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link
 ```
 
 Expected Response:
@@ -79,7 +79,7 @@ Create a file `test_api.sh`:
 ```bash
 #!/bin/bash
 
-API_URL="https://feedback.wiseserve.net/functions/v1/generate-feedback-link"
+API_URL="https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link"
 
 echo "=== Testing Feedback Link Generation API ==="
 

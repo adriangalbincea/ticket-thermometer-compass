@@ -31,7 +31,7 @@ export const ApiConfig: React.FC = () => {
   const [apiResponse, setApiResponse] = useState<string>('');
   const [loading, setLoading] = useState(false);
   
-  const API_ENDPOINT = 'https://feedback.wiseserve.net/functions/v1/generate-feedback-link';
+  const API_ENDPOINT = 'https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link';
 
   const { toast } = useToast();
 

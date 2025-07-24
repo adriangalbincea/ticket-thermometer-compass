@@ -25,7 +25,7 @@ const ApiTestGuide: React.FC = () => {
   const testApiEndpoint = async () => {
     setTestLoading(true);
     try {
-      const response = await fetch('https://feedback.wiseserve.net/functions/v1/generate-feedback-link', {
+      const response = await fetch('https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ const ApiTestGuide: React.FC = () => {
     }
   };
 
-  const curlExample = `curl -X POST https://feedback.wiseserve.net/functions/v1/generate-feedback-link \\
+  const curlExample = `curl -X POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link \\
   -H "Content-Type: application/json" \\
   -d '{
     "ticket_number": "TK-12345",
@@ -78,7 +78,7 @@ const ApiTestGuide: React.FC = () => {
   }'`;
 
   const jsExample = `const generateFeedbackLink = async (ticketData) => {
-  const response = await fetch('https://feedback.wiseserve.net/functions/v1/generate-feedback-link', {
+  const response = await fetch('https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ const ApiTestGuide: React.FC = () => {
 import json
 
 def generate_feedback_link(ticket_data):
-    url = "https://feedback.wiseserve.net/functions/v1/generate-feedback-link"
+    url = "https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link"
     
     payload = {
         "ticket_number": ticket_data["ticket_number"],
@@ -170,7 +170,7 @@ def generate_feedback_link(ticket_data):
                   </Button>
                   
                   <Badge variant="outline" className="text-sm">
-                    POST https://feedback.wiseserve.net/functions/v1/generate-feedback-link
+                    POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link
                   </Badge>
                 </div>
 
@@ -220,13 +220,13 @@ def generate_feedback_link(ticket_data):
                   </h4>
                   <div className="relative">
                     <pre className="bg-muted p-4 rounded-md text-sm overflow-auto">
-                      {`curl https://feedback.wiseserve.net/functions/v1/generate-feedback-link`}
+                      {`curl https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link`}
                     </pre>
                     <Button 
                       size="sm" 
                       variant="outline" 
                       className="absolute top-2 right-2"
-                      onClick={() => copyToClipboard('curl https://feedback.wiseserve.net/functions/v1/generate-feedback-link')}
+                      onClick={() => copyToClipboard('curl https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link')}
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
@@ -240,7 +240,7 @@ def generate_feedback_link(ticket_data):
                   </h4>
                   <div className="relative">
                     <pre className="bg-muted p-4 rounded-md text-sm overflow-auto">
-{`curl -X POST https://feedback.wiseserve.net/functions/v1/generate-feedback-link \\
+{`curl -X POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link \\
   -H "Content-Type: application/json" \\
   -d '{
     "ticket_number": "TEST-001"
@@ -250,7 +250,7 @@ def generate_feedback_link(ticket_data):
                       size="sm" 
                       variant="outline" 
                       className="absolute top-2 right-2"
-                      onClick={() => copyToClipboard(`curl -X POST https://feedback.wiseserve.net/functions/v1/generate-feedback-link \\
+                      onClick={() => copyToClipboard(`curl -X POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link \\
   -H "Content-Type: application/json" \\
   -d '{
     "ticket_number": "TEST-001"
@@ -324,7 +324,7 @@ def generate_feedback_link(ticket_data):
                 <div>
                   <h4 className="font-semibold mb-2">Endpoint</h4>
                   <Badge variant="outline" className="text-sm">
-                    POST https://feedback.wiseserve.net/functions/v1/generate-feedback-link
+                    POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link
                   </Badge>
                 </div>
 
