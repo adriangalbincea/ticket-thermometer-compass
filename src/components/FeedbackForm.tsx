@@ -43,11 +43,6 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
 
     onSubmit?.(feedbackData);
     setIsSubmitted(true);
-    
-    toast({
-      title: "Thank you for your feedback!",
-      description: "Your response has been recorded.",
-    });
   };
 
   if (isSubmitted) {
