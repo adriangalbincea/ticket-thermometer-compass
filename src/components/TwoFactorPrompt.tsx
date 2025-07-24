@@ -35,33 +35,20 @@ export const TwoFactorPrompt: React.FC<TwoFactorPromptProps> = ({ onSuccess, onC
       if (!user) throw new Error('No user found');
 
       if (useBackupCode) {
-        // Handle backup code verification
-        const { data: userTwoFA, error: fetchError } = await supabase
-          .from('user_2fa')
-          .select('backup_codes')
-          .eq('user_id', user.id)
-          .eq('is_enabled', true)
-          .single();
+        // Handle backup code verification using edge function
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('No session found');
 
-        if (fetchError) throw fetchError;
+        const { data, error } = await supabase.functions.invoke('verify-totp', {
+          body: { backup_code: code },
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
 
-        const isValidBackupCode = userTwoFA?.backup_codes?.includes(code.toUpperCase());
-        
-        if (!isValidBackupCode) {
-          throw new Error('Invalid backup code');
+        if (error || !data?.success) {
+          throw new Error(data?.error || 'Invalid backup code');
         }
-
-        // Remove used backup code
-        const updatedBackupCodes = userTwoFA.backup_codes.filter(
-          (backupCode: string) => backupCode !== code.toUpperCase()
-        );
-
-        const { error: updateError } = await supabase
-          .from('user_2fa')
-          .update({ backup_codes: updatedBackupCodes })
-          .eq('user_id', user.id);
-
-        if (updateError) throw updateError;
 
         toast({
           title: "Success",
@@ -70,17 +57,19 @@ export const TwoFactorPrompt: React.FC<TwoFactorPromptProps> = ({ onSuccess, onC
         
         onSuccess();
       } else {
-        // Handle TOTP verification
-        const { data: isValid, error } = await supabase
-          .rpc('verify_totp_token', {
-            user_id: user.id,
-            token: code
-          });
+        // Handle TOTP verification using edge function
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('No session found');
 
-        if (error) throw error;
+        const { data, error } = await supabase.functions.invoke('verify-totp', {
+          body: { token: code },
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
 
-        if (!isValid) {
-          throw new Error('Invalid authentication code');
+        if (error || !data?.success) {
+          throw new Error(data?.error || 'Invalid authentication code');
         }
 
         toast({
