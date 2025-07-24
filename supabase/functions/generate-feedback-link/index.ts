@@ -162,13 +162,8 @@ serve(async (req) => {
 
     console.log('Generated token:', token);
 
-    // Build feedback URL
-    const origin = req.headers.get('origin') || 
-                   (req.headers.get('x-forwarded-proto') && req.headers.get('host') ? 
-                    `${req.headers.get('x-forwarded-proto')}://${req.headers.get('host')}` : 
-                    'https://your-domain.com');
-    
-    const feedbackUrl = `${origin}/feedback/${token}`;
+    // Build feedback URL with custom domain
+    const feedbackUrl = `https://feedback.wiseserve.net/feedback/${token}`;
 
     console.log('Successfully created feedback link:', { token, feedbackUrl });
 
