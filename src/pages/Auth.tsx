@@ -25,6 +25,9 @@ const Auth: React.FC = () => {
   useEffect(() => {
     // Check if user is already logged in
     const checkUser = async () => {
+      // Don't check initial session if we're already in 2FA flow
+      if (checking2FA || show2FA) return;
+      
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setUser(session.user);
@@ -36,17 +39,19 @@ const Auth: React.FC = () => {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user && !checking2FA && !show2FA) {
-        // Only navigate if we're not in the middle of 2FA verification
+      // Don't interfere with 2FA flow
+      if (checking2FA || show2FA) return;
+      
+      if (session?.user) {
         setUser(session.user);
         navigate('/admin');
-      } else if (!session?.user && !show2FA) {
+      } else {
         setUser(null);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, checking2FA, show2FA]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,9 +90,7 @@ const Auth: React.FC = () => {
           // Store pending user and show 2FA prompt
           setPendingUser(data.user);
           setShow2FA(true);
-          
-          // Sign out temporarily until 2FA is verified
-          await supabase.auth.signOut();
+          // Don't sign out, just show the 2FA prompt
           return;
         } else {
           // Admin user needs to set up 2FA but hasn't yet
@@ -128,23 +131,6 @@ const Auth: React.FC = () => {
   const handle2FASuccess = async () => {
     if (!pendingUser) return;
     
-    // Re-authenticate the user after successful 2FA
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      toast({
-        title: "Authentication error",
-        description: error.message,
-        variant: "destructive",
-      });
-      setShow2FA(false);
-      setPendingUser(null);
-      return;
-    }
-
     setShow2FA(false);
     setPendingUser(null);
     setChecking2FA(false);
@@ -161,6 +147,7 @@ const Auth: React.FC = () => {
     setShow2FA(false);
     setPendingUser(null);
     setChecking2FA(false);
+    // Sign out the user since they cancelled 2FA
     await supabase.auth.signOut();
   };
 
