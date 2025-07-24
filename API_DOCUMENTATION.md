@@ -37,7 +37,7 @@ curl -X POST https://feedback.wiseserve.net/functions/v1/generate-feedback-link 
   -d '{
     "ticket_number": "TK-12345",
     "technician": "John Doe",
-    "ticket_title": "Computer won'\''t start",
+    "ticket_title": "Computer won't start",
     "customer_email": "customer@example.com",
     "customer_name": "Jane Smith",
     "expires_hours": 48
