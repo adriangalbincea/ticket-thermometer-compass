@@ -138,19 +138,36 @@ export const WebhookConfig: React.FC = () => {
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('generate-feedback-link', {
-        body: {
-          ticket_number: 'TEST-001',
-          technician: 'Test User',
-          ticket_title: 'Webhook test',
-        }
+      // Test the configured webhook URL by sending a POST request
+      const testPayload = {
+        ticket_number: 'TEST-001',
+        technician: 'Test User',
+        ticket_title: 'Webhook test',
+        customer_email: 'test@example.com',
+        customer_name: 'Test Customer',
+        expires_hours: 72
+      };
+
+      const response = await fetch(config.webhook_url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(config.secret_key && { 'X-Secret-Key': config.secret_key })
+        },
+        body: JSON.stringify(testPayload)
       });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
 
+      const result = await response.json();
+      
       toast({
-        title: "Webhook Test Sent",
-        description: "A test payload has been sent to your webhook URL.",
+        title: "Webhook Test Successful",
+        description: result.data?.feedback_url ? 
+          `Feedback link created: ${result.data.feedback_url}` : 
+          "Test payload sent successfully.",
       });
     } catch (error: any) {
       toast({
