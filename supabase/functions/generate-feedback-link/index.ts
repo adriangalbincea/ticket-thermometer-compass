@@ -4,7 +4,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.52.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-requested-with',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Max-Age': '86400'
 };
 
 interface FeedbackLinkRequest {
@@ -17,24 +19,49 @@ interface FeedbackLinkRequest {
 }
 
 serve(async (req) => {
-  console.log('Function called with method:', req.method);
+  console.log('=== Function called ===');
+  console.log('Method:', req.method);
+  console.log('URL:', req.url);
+  console.log('Origin:', req.headers.get('origin'));
+  console.log('User-Agent:', req.headers.get('user-agent'));
+  
+  // Health check endpoint for testing external access
+  if (req.method === 'GET') {
+    console.log('Health check request received');
+    return new Response(
+      JSON.stringify({ 
+        status: 'healthy', 
+        message: 'API is accessible',
+        timestamp: new Date().toISOString()
+      }),
+      { 
+        status: 200,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders } 
+      }
+    );
+  }
   
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    console.log('Handling CORS preflight');
-    return new Response(null, { headers: corsHeaders });
+    console.log('Handling CORS preflight request');
+    return new Response(null, { 
+      status: 200,
+      headers: corsHeaders 
+    });
   }
 
   if (req.method !== 'POST') {
-    console.log('Invalid method:', req.method);
+    console.log('Invalid method received:', req.method);
     return new Response(
-      JSON.stringify({ error: 'Method not allowed' }),
+      JSON.stringify({ error: 'Method not allowed. Use POST for API calls, GET for health check.' }),
       { 
         status: 405, 
         headers: { 'Content-Type': 'application/json', ...corsHeaders } 
       }
     );
   }
+
+  console.log('Processing POST request...');
 
   try {
     console.log('Starting feedback link generation...');
