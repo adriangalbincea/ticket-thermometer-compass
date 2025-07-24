@@ -17,6 +17,7 @@ const Auth: React.FC = () => {
   const [user, setUser] = useState(null);
   const [show2FA, setShow2FA] = useState(false);
   const [pendingUser, setPendingUser] = useState(null);
+  const [checking2FA, setChecking2FA] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { check2FARequirement } = useAuth();
@@ -34,11 +35,12 @@ const Auth: React.FC = () => {
     checkUser();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user && !checking2FA && !show2FA) {
+        // Only navigate if we're not in the middle of 2FA verification
         setUser(session.user);
         navigate('/admin');
-      } else {
+      } else if (!session?.user && !show2FA) {
         setUser(null);
       }
     });
@@ -49,6 +51,7 @@ const Auth: React.FC = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setChecking2FA(true);
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -57,11 +60,13 @@ const Auth: React.FC = () => {
       });
 
       if (error) {
+        setChecking2FA(false);
         toast({
           title: "Sign in failed",
           description: error.message,
           variant: "destructive",
         });
+        setLoading(false);
         return;
       }
 
@@ -86,20 +91,27 @@ const Auth: React.FC = () => {
           return;
         } else {
           // Admin user needs to set up 2FA but hasn't yet
+          setChecking2FA(false);
+          await supabase.auth.signOut();
           toast({
             title: "2FA Setup Required",
             description: "As an admin, you must set up two-factor authentication. Please go to your profile settings to enable 2FA.",
             variant: "destructive",
           });
+          setLoading(false);
           return;
         }
       }
+
+      // No 2FA required, proceed with normal login
+      setChecking2FA(false);
 
       toast({
         title: "Welcome back!",
         description: "You've been signed in successfully.",
       });
     } catch (error) {
+      setChecking2FA(false);
       toast({
         title: "Error",
         description: "An unexpected error occurred.",
@@ -107,6 +119,9 @@ const Auth: React.FC = () => {
       });
     } finally {
       setLoading(false);
+      if (!show2FA) {
+        setChecking2FA(false);
+      }
     }
   };
 
@@ -132,6 +147,7 @@ const Auth: React.FC = () => {
 
     setShow2FA(false);
     setPendingUser(null);
+    setChecking2FA(false);
     
     toast({
       title: "Welcome back!",
@@ -144,6 +160,7 @@ const Auth: React.FC = () => {
   const handle2FACancel = async () => {
     setShow2FA(false);
     setPendingUser(null);
+    setChecking2FA(false);
     await supabase.auth.signOut();
   };
 
