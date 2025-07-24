@@ -136,7 +136,7 @@ const Auth: React.FC = () => {
           <img 
             src="/lovable-uploads/00a9f4fc-8ab5-4dd4-85ff-7abd95d3761e.png" 
             alt="WiseServe Logo" 
-            className="h-16 mx-auto mb-4"
+            className="h-24 mx-auto mb-4"
           />
         </div>
 
