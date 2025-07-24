@@ -39,8 +39,13 @@ const Auth: React.FC = () => {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state change:', event, 'checking2FA:', checking2FA, 'show2FA:', show2FA);
+      
       // Don't interfere with 2FA flow
-      if (checking2FA || show2FA) return;
+      if (checking2FA || show2FA) {
+        console.log('Ignoring auth state change during 2FA flow');
+        return;
+      }
       
       if (session?.user) {
         setUser(session.user);
@@ -95,8 +100,10 @@ const Auth: React.FC = () => {
           // Store pending user and show 2FA prompt
           setPendingUser(data.user);
           setShow2FA(true);
-          // Sign out immediately to prevent access without 2FA
-          await supabase.auth.signOut();
+          // Small delay to ensure state updates before signing out
+          setTimeout(async () => {
+            await supabase.auth.signOut();
+          }, 100);
           return;
         } else {
           // Admin user needs to set up 2FA but hasn't yet
