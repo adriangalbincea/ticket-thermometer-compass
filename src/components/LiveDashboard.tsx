@@ -261,17 +261,10 @@ export const LiveDashboard: React.FC = () => {
       {/* Charts */}
       {totalFeedback > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card 
-            className="shadow-card cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => {
-              toast({
-                title: "Chart Clicked",
-                description: "Feedback Distribution chart was clicked!",
-              });
-            }}
-          >
+          <Card className="shadow-card">
             <CardHeader>
               <CardTitle>Feedback Distribution</CardTitle>
+              <p className="text-sm text-muted-foreground">Click on bars to filter feedback</p>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -280,23 +273,30 @@ export const LiveDashboard: React.FC = () => {
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip />
-                  <Bar dataKey="value" fill="hsl(var(--primary))" />
+                  <Bar 
+                    dataKey="value" 
+                    fill="hsl(var(--primary))"
+                    cursor="pointer"
+                    onClick={(data) => {
+                      if (data) {
+                        const feedbackType = data.name.toLowerCase();
+                        setSelectedFeedback(feedbackType);
+                        toast({
+                          title: "Filter Applied",
+                          description: `Showing ${data.name} feedback only`,
+                        });
+                      }
+                    }}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
 
-          <Card 
-            className="shadow-card cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => {
-              toast({
-                title: "Chart Clicked", 
-                description: "Satisfaction Breakdown chart was clicked!",
-              });
-            }}
-          >
+          <Card className="shadow-card">
             <CardHeader>
               <CardTitle>Satisfaction Breakdown</CardTitle>
+              <p className="text-sm text-muted-foreground">Click on slices to filter feedback</p>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -310,6 +310,17 @@ export const LiveDashboard: React.FC = () => {
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
+                    cursor="pointer"
+                    onClick={(data) => {
+                      if (data) {
+                        const feedbackType = data.name.toLowerCase();
+                        setSelectedFeedback(feedbackType);
+                        toast({
+                          title: "Filter Applied",
+                          description: `Showing ${data.name} feedback only`,
+                        });
+                      }
+                    }}
                   >
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -363,6 +374,22 @@ export const LiveDashboard: React.FC = () => {
                 <SelectItem value="bad">Bad</SelectItem>
               </SelectContent>
             </Select>
+            
+            {selectedFeedback !== 'all' && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  setSelectedFeedback('all');
+                  toast({
+                    title: "Filter Cleared",
+                    description: "Showing all feedback types",
+                  });
+                }}
+              >
+                Clear Filter
+              </Button>
+            )}
 
             <Select value={dateFilter} onValueChange={setDateFilter}>
               <SelectTrigger className="w-40">
