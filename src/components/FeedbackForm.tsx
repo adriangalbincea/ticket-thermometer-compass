@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,6 +24,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
   const [selectedFeedback, setSelectedFeedback] = useState<FeedbackType | null>(null);
   const [comment, setComment] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [countdown, setCountdown] = useState(5);
   const { toast } = useToast();
 
   const handleFeedbackSelect = (type: FeedbackType) => {
@@ -45,19 +46,25 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
     setIsSubmitted(true);
   };
 
+  useEffect(() => {
+    if (isSubmitted && countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (isSubmitted && countdown === 0) {
+      window.location.href = 'https://wiseserve.net';
+    }
+  }, [isSubmitted, countdown]);
+
   if (isSubmitted) {
     return (
       <Card className="w-full max-w-2xl mx-auto shadow-card">
         <CardContent className="p-8 text-center">
           <CheckCircle className="h-16 w-16 text-feedback-happy mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-foreground mb-2">Thank You!</h2>
-          <p className="text-muted-foreground mb-6">Your feedback has been successfully submitted.</p>
-          <Button 
-            onClick={() => window.location.href = 'https://wiseserve.net'} 
-            variant="outline"
-          >
-            Return to WiseServe
-          </Button>
+          <p className="text-muted-foreground mb-4">Your feedback has been successfully submitted.</p>
+          <p className="text-muted-foreground text-sm">
+            Redirecting to WiseServe in {countdown} second{countdown !== 1 ? 's' : ''}...
+          </p>
         </CardContent>
       </Card>
     );
