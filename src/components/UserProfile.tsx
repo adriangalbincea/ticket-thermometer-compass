@@ -118,23 +118,25 @@ export const UserProfile: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6">{/* Reduced from 2xl to 3xl for slightly larger but still compact */}
       {/* Profile Information */}
       <Card className="shadow-elegant">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-2 text-lg">
             <User className="h-5 w-5" />
             Profile Information
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>Name</Label>
-            <Input value={userProfile?.full_name || 'Not set'} disabled />
-          </div>
-          <div className="space-y-2">
-            <Label>Email</Label>
-            <Input value={user?.email || ''} disabled />
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Name</Label>
+              <Input value={userProfile?.full_name || 'Not set'} disabled />
+            </div>
+            <div className="space-y-2">
+              <Label>Email</Label>
+              <Input value={user?.email || ''} disabled />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -143,8 +145,8 @@ export const UserProfile: React.FC = () => {
 
       {/* Change Password */}
       <Card className="shadow-elegant">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-2 text-lg">
             <Lock className="h-5 w-5" />
             Change Password
           </CardTitle>
