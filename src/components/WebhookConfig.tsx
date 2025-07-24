@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,319 +6,297 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Copy, Check, Webhook, Globe, Mail, Database, Settings } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
+import { Webhook, Globe, Key, Copy, Send, CheckCircle, XCircle, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+interface WebhookConfig {
+  id?: string;
+  webhook_url: string;
+  secret_key: string;
+  enabled: boolean;
+  events: string[];
+}
 
 export const WebhookConfig: React.FC = () => {
-  const [webhookUrl, setWebhookUrl] = useState('https://feedback.yourcompany.com/webhook/receive');
-  const [isEnabled, setIsEnabled] = useState(true);
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [copied, setCopied] = useState(false);
-  const [sampleCopied, setSampleCopied] = useState(false);
-  const [settings, setSettings] = useState({
-    webhookUrl,
-    isEnabled,
-    emailNotifications
+  const [config, setConfig] = useState<WebhookConfig>({
+    webhook_url: '',
+    secret_key: '',
+    enabled: false,
+    events: ['feedback_submitted']
   });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
-  const handleCopy = async (text: string) => {
+  useEffect(() => {
+    loadWebhookConfig();
+  }, []);
+
+  const loadWebhookConfig = async () => {
     try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      const { data, error } = await supabase
+        .from('webhook_config')
+        .select('*')
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+
+      if (data) {
+        setConfig({
+          id: data.id,
+          webhook_url: data.webhook_url || '',
+          secret_key: data.secret_key || '',
+          enabled: data.enabled || false,
+          events: data.events || ['feedback_submitted']
+        });
+      }
+    } catch (error: any) {
       toast({
-        title: "Copied to clipboard",
-        description: "The webhook URL has been copied.",
+        title: "Error",
+        description: "Failed to load webhook configuration: " + error.message,
+        variant: "destructive",
       });
-    } catch (err) {
-      console.error('Failed to copy: ', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSampleCopy = async (text: string) => {
+  const handleSaveConfig = async () => {
+    setSaving(true);
     try {
-      await navigator.clipboard.writeText(text);
-      setSampleCopied(true);
-      setTimeout(() => setSampleCopied(false), 2000);
+      const configData = {
+        webhook_url: config.webhook_url,
+        secret_key: config.secret_key,
+        enabled: config.enabled,
+        events: config.events
+      };
+
+      let result;
+      if (config.id) {
+        // Update existing config
+        result = await supabase
+          .from('webhook_config')
+          .update(configData)
+          .eq('id', config.id);
+      } else {
+        // Insert new config
+        result = await supabase
+          .from('webhook_config')
+          .insert(configData)
+          .select()
+          .single();
+      }
+
+      if (result.error) {
+        throw result.error;
+      }
+
+      if (!config.id && result.data) {
+        setConfig(prev => ({ ...prev, id: result.data.id }));
+      }
+
       toast({
-        title: "Copied to clipboard",
-        description: "Sample payload has been copied.",
+        title: "Configuration Saved",
+        description: "Webhook configuration has been saved successfully.",
       });
-    } catch (err) {
-      console.error('Failed to copy: ', err);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to save webhook configuration: " + error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
     }
+  };
+
+  const generateSecretKey = () => {
+    const newKey = crypto.randomUUID().replace(/-/g, '');
+    setConfig(prev => ({ ...prev, secret_key: newKey }));
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied!",
+      description: "Text copied to clipboard.",
+    });
   };
 
   const testWebhook = async () => {
+    if (!config.webhook_url) {
+      toast({
+        title: "Error",
+        description: "Please enter a webhook URL first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { data, error } = await supabase.functions.invoke('generate-feedback-link', {
         body: {
           ticket_number: 'TEST-001',
-          technician: 'Test Technician', 
-          ticket_title: 'Test webhook functionality',
-          customer_email: 'test@example.com'
+          technician: 'Test User',
+          ticket_title: 'Webhook test',
         }
       });
 
       if (error) throw error;
 
       toast({
-        title: "Webhook Test Successful",
-        description: `Test link created: ${data.feedback_url}`,
+        title: "Webhook Test Sent",
+        description: "A test payload has been sent to your webhook URL.",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
-        title: "Webhook Test Failed",
-        description: "Could not connect to webhook endpoint.",
+        title: "Test Failed",
+        description: "Failed to send test webhook: " + error.message,
         variant: "destructive",
       });
     }
   };
 
-  const saveSettings = () => {
-    setSettings({
-      webhookUrl,
-      isEnabled,
-      emailNotifications
-    });
-    toast({
-      title: "Settings Saved",
-      description: "Your webhook configuration has been updated.",
-    });
-  };
-
-  const samplePayload = {
+  const samplePayload = `{
+  "event": "feedback_submitted",
+  "data": {
     "ticket_number": "TK-2024-001",
     "technician": "John Smith",
-    "ticket_title": "Network connectivity issue resolved",
-    "customer_email": "customer@example.com",
     "feedback_type": "happy",
-    "comment": "Great service, issue resolved quickly!",
-    "timestamp": "2024-01-15T14:30:00Z",
-    "satisfaction_score": 5
-  };
+    "comment": "Great service!",
+    "submitted_at": "2024-01-15T10:30:00Z"
+  }
+}`;
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Webhook Configuration</h1>
-        <p className="text-muted-foreground mt-1">Configure webhook endpoints and integration settings</p>
+      {/* Configuration Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Webhook Configuration</h1>
+          <p className="text-muted-foreground mt-1">Configure webhooks to receive real-time notifications</p>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Badge variant={config.enabled ? "default" : "secondary"} className="flex items-center gap-1">
+            {config.enabled ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+            {config.enabled ? 'Enabled' : 'Disabled'}
+          </Badge>
+        </div>
       </div>
 
-      <Tabs defaultValue="webhook" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="webhook" className="flex items-center gap-2">
-            <Webhook className="h-4 w-4" />
-            Webhook
-          </TabsTrigger>
-          <TabsTrigger value="email" className="flex items-center gap-2">
-            <Mail className="h-4 w-4" />
-            Email
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Settings
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="webhook" className="space-y-6">
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Webhook className="h-5 w-5" />
-                Webhook Configuration
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="webhook-url">Webhook URL</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="webhook-url"
-                    value={webhookUrl}
-                    onChange={(e) => setWebhookUrl(e.target.value)}
-                    placeholder="https://your-server.com/webhook"
-                  />
-                  <Button 
-                    variant="outline" 
-                    size="icon"
-                    onClick={() => handleCopy(webhookUrl)}
-                  >
-                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="webhook-enabled"
-                  checked={isEnabled}
-                  onCheckedChange={setIsEnabled}
+      {/* Main Configuration */}
+      <Card className="shadow-elegant">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Settings className="h-5 w-5" />
+            Webhook Settings
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="webhook-url">Webhook URL*</Label>
+              <Input
+                id="webhook-url"
+                type="url"
+                value={config.webhook_url}
+                onChange={(e) => setConfig(prev => ({ ...prev, webhook_url: e.target.value }))}
+                placeholder="https://your-app.com/webhooks/feedback"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="secret-key">Secret Key</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="secret-key"
+                  value={config.secret_key}
+                  onChange={(e) => setConfig(prev => ({ ...prev, secret_key: e.target.value }))}
+                  placeholder="Enter or generate a secret key"
                 />
-                <Label htmlFor="webhook-enabled">Enable webhook</Label>
-                <Badge variant={isEnabled ? "default" : "secondary"}>
-                  {isEnabled ? "Active" : "Inactive"}
-                </Badge>
-              </div>
-
-              <Alert>
-                <Globe className="h-4 w-4" />
-                <AlertDescription>
-                  Your webhook will receive POST requests with feedback data. Make sure your endpoint can handle JSON payloads.
-                </AlertDescription>
-              </Alert>
-
-              <div className="flex gap-4">
-                <Button onClick={testWebhook} variant="outline">
-                  Test Webhook
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={generateSecretKey}
+                >
+                  <Key className="h-4 w-4" />
                 </Button>
-                <Button onClick={saveSettings} className="bg-gradient-primary">
-                  Save Configuration
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => copyToClipboard(config.secret_key)}
+                  disabled={!config.secret_key}
+                >
+                  <Copy className="h-4 w-4" />
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle>Sample Webhook Payload</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-muted rounded-lg p-4">
-                <pre className="text-sm text-foreground overflow-x-auto">
-                  {JSON.stringify(samplePayload, null, 2)}
-                </pre>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Enable Webhooks</Label>
+                <p className="text-sm text-muted-foreground">
+                  Turn on to start receiving webhook notifications
+                </p>
               </div>
-              <Button 
-                variant="outline" 
-                className="mt-4"
-                onClick={() => handleSampleCopy(JSON.stringify(samplePayload, null, 2))}
-              >
-                {sampleCopied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
-                Copy Sample Payload
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              <Switch
+                checked={config.enabled}
+                onCheckedChange={(checked) => setConfig(prev => ({ ...prev, enabled: checked }))}
+              />
+            </div>
 
-        <TabsContent value="email" className="space-y-6">
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Mail className="h-5 w-5" />
-                Email Notifications
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="email-notifications"
-                  checked={emailNotifications}
-                  onCheckedChange={setEmailNotifications}
-                />
-                <Label htmlFor="email-notifications">Send email notifications</Label>
-              </div>
+            <Button onClick={handleSaveConfig} className="bg-gradient-primary" disabled={saving}>
+              {saving ? "Saving..." : "Save Configuration"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="smtp-host">SMTP Host</Label>
-                  <Input id="smtp-host" placeholder="smtp.gmail.com" />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="smtp-port">SMTP Port</Label>
-                    <Input id="smtp-port" placeholder="587" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="smtp-encryption">Encryption</Label>
-                    <Input id="smtp-encryption" placeholder="TLS" />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="from-email">From Email</Label>
-                  <Input id="from-email" placeholder="noreply@yourcompany.com" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="notification-recipients">Notification Recipients</Label>
-                  <Textarea 
-                    id="notification-recipients" 
-                    placeholder="admin@yourcompany.com, manager@yourcompany.com"
-                    rows={3}
-                  />
-                </div>
-              </div>
-
-              <Button className="bg-gradient-primary">Save Email Settings</Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-
-        <TabsContent value="settings" className="space-y-6">
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
-                General Settings
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="app-name">Application Name</Label>
-                  <Input id="app-name" defaultValue="Customer Thermometer" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="company-name">Company Name</Label>
-                  <Input id="company-name" placeholder="Your Company" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="feedback-url">Public Feedback URL</Label>
-                  <Input id="feedback-url" defaultValue="https://feedback.yourcompany.com" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="retention-days">Data Retention (days)</Label>
-                  <Input id="retention-days" type="number" defaultValue="365" />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Security Settings</h3>
-                
-                <div className="flex items-center space-x-2">
-                  <Switch id="require-https" defaultChecked />
-                  <Label htmlFor="require-https">Require HTTPS</Label>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Switch id="api-auth" defaultChecked />
-                  <Label htmlFor="api-auth">Enable API Authentication</Label>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="api-key">API Key</Label>
-                  <div className="flex gap-2">
-                    <Input id="api-key" value="ct_live_sk_12345...abcdef" readOnly />
-                    <Button variant="outline" size="sm">Regenerate</Button>
-                  </div>
-                </div>
-              </div>
-
-              <Button className="bg-gradient-primary">Save General Settings</Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      {/* Testing & Documentation */}
+      <Card className="shadow-elegant">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Webhook className="h-5 w-5" />
+            Testing & Documentation
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Sample Payload</Label>
+            <Textarea
+              value={samplePayload}
+              readOnly
+              className="font-mono text-sm"
+              rows={12}
+            />
+          </div>
+          
+          <div className="flex gap-2">
+            <Button onClick={() => copyToClipboard(samplePayload)} variant="outline">
+              <Copy className="h-4 w-4 mr-2" />
+              Copy Sample Payload
+            </Button>
+            
+            <Button onClick={testWebhook} variant="outline">
+              <Send className="h-4 w-4 mr-2" />
+              Test Webhook
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          created_at: string
+          id: string
+          setting_key: string
+          setting_value: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          setting_key: string
+          setting_value?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          setting_key?: string
+          setting_value?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       feedback_links: {
         Row: {
           created_at: string
@@ -118,6 +142,36 @@ export type Database = {
           id?: string
           role?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      webhook_config: {
+        Row: {
+          created_at: string
+          enabled: boolean | null
+          events: string[] | null
+          id: string
+          secret_key: string | null
+          updated_at: string
+          webhook_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean | null
+          events?: string[] | null
+          id?: string
+          secret_key?: string | null
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean | null
+          events?: string[] | null
+          id?: string
+          secret_key?: string | null
+          updated_at?: string
+          webhook_url?: string | null
         }
         Relationships: []
       }

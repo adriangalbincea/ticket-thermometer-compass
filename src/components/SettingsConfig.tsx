@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,16 +7,104 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Settings, Mail, Server, Shield } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 export const SettingsConfig: React.FC = () => {
+  const [settings, setSettings] = useState({
+    company_name: '',
+    support_email: '',
+    auto_archive: false,
+    email_notifications: false,
+    session_timeout: '60',
+    two_factor_auth: false,
+    ip_whitelist: false
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
-  const handleSaveSettings = () => {
-    toast({
-      title: "Settings Saved",
-      description: "System settings have been updated successfully.",
-    });
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('app_settings')
+        .select('setting_key, setting_value');
+
+      if (error) throw error;
+
+      if (data) {
+        const settingsMap = data.reduce((acc, item) => {
+          acc[item.setting_key] = item.setting_value;
+          return acc;
+        }, {} as Record<string, string>);
+
+        setSettings({
+          company_name: settingsMap.company_name || '',
+          support_email: settingsMap.support_email || '',
+          auto_archive: settingsMap.auto_archive === 'true',
+          email_notifications: settingsMap.email_notifications === 'true',
+          session_timeout: settingsMap.session_timeout || '60',
+          two_factor_auth: settingsMap.two_factor_auth === 'true',
+          ip_whitelist: settingsMap.ip_whitelist === 'true'
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to load settings: " + error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    setSaving(true);
+    try {
+      const settingsToSave = [
+        { setting_key: 'company_name', setting_value: settings.company_name },
+        { setting_key: 'support_email', setting_value: settings.support_email },
+        { setting_key: 'auto_archive', setting_value: settings.auto_archive.toString() },
+        { setting_key: 'email_notifications', setting_value: settings.email_notifications.toString() },
+        { setting_key: 'session_timeout', setting_value: settings.session_timeout },
+        { setting_key: 'two_factor_auth', setting_value: settings.two_factor_auth.toString() },
+        { setting_key: 'ip_whitelist', setting_value: settings.ip_whitelist.toString() }
+      ];
+
+      for (const setting of settingsToSave) {
+        const { error } = await supabase
+          .from('app_settings')
+          .upsert(setting, { onConflict: 'setting_key' });
+
+        if (error) throw error;
+      }
+
+      toast({
+        title: "Settings Saved",
+        description: "System settings have been updated successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to save settings: " + error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   };
 
   return (
@@ -35,6 +123,8 @@ export const SettingsConfig: React.FC = () => {
               <Label htmlFor="company-name">Company Name</Label>
               <Input
                 id="company-name"
+                value={settings.company_name}
+                onChange={(e) => setSettings(prev => ({ ...prev, company_name: e.target.value }))}
                 placeholder="Your Company Ltd"
               />
             </div>
@@ -44,6 +134,8 @@ export const SettingsConfig: React.FC = () => {
               <Input
                 id="support-email"
                 type="email"
+                value={settings.support_email}
+                onChange={(e) => setSettings(prev => ({ ...prev, support_email: e.target.value }))}
                 placeholder="support@company.com"
               />
             </div>
@@ -57,7 +149,10 @@ export const SettingsConfig: React.FC = () => {
                   Automatically archive feedback older than 90 days
                 </p>
               </div>
-              <Switch />
+              <Switch 
+                checked={settings.auto_archive}
+                onCheckedChange={(checked) => setSettings(prev => ({ ...prev, auto_archive: checked }))}
+              />
             </div>
 
             <div className="flex items-center justify-between">
@@ -67,12 +162,15 @@ export const SettingsConfig: React.FC = () => {
                   Send email alerts for new feedback submissions
                 </p>
               </div>
-              <Switch />
+              <Switch 
+                checked={settings.email_notifications}
+                onCheckedChange={(checked) => setSettings(prev => ({ ...prev, email_notifications: checked }))}
+              />
             </div>
           </div>
 
-          <Button onClick={handleSaveSettings} className="bg-gradient-primary">
-            Save General Settings
+          <Button onClick={handleSaveSettings} className="bg-gradient-primary" disabled={saving}>
+            {saving ? "Saving..." : "Save General Settings"}
           </Button>
         </CardContent>
       </Card>
@@ -88,7 +186,7 @@ export const SettingsConfig: React.FC = () => {
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="session-timeout">Session Timeout (minutes)</Label>
-            <Select>
+            <Select value={settings.session_timeout} onValueChange={(value) => setSettings(prev => ({ ...prev, session_timeout: value }))}>
               <SelectTrigger>
                 <SelectValue placeholder="Select timeout" />
               </SelectTrigger>
@@ -109,7 +207,10 @@ export const SettingsConfig: React.FC = () => {
                   Require 2FA for admin accounts
                 </p>
               </div>
-              <Switch />
+              <Switch 
+                checked={settings.two_factor_auth}
+                onCheckedChange={(checked) => setSettings(prev => ({ ...prev, two_factor_auth: checked }))}
+              />
             </div>
 
             <div className="flex items-center justify-between">
@@ -119,12 +220,15 @@ export const SettingsConfig: React.FC = () => {
                   Restrict admin access to specific IP addresses
                 </p>
               </div>
-              <Switch />
+              <Switch 
+                checked={settings.ip_whitelist}
+                onCheckedChange={(checked) => setSettings(prev => ({ ...prev, ip_whitelist: checked }))}
+              />
             </div>
           </div>
 
-          <Button onClick={handleSaveSettings} className="bg-gradient-primary">
-            Save Security Settings
+          <Button onClick={handleSaveSettings} className="bg-gradient-primary" disabled={saving}>
+            {saving ? "Saving..." : "Save Security Settings"}
           </Button>
         </CardContent>
       </Card>
