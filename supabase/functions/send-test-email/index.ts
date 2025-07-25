@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const MAILCHIMP_API_KEY = Deno.env.get("MAILCHIMP_API_KEY");
+const MAILCHIMP_SERVER = MAILCHIMP_API_KEY?.split('-')[1]; // Extract server from API key
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -40,19 +40,46 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Attempting to send email with:", { 
       to, 
       subject, 
-      fromEmail: fromEmail || "Test <onboarding@resend.dev>",
+      fromEmail: fromEmail || "feedback@wiseserve.net",
       hasContent: !!htmlContent
     });
-    console.log("RESEND_API_KEY configured:", !!Deno.env.get("RESEND_API_KEY"));
+    console.log("MAILCHIMP_API_KEY configured:", !!MAILCHIMP_API_KEY);
+    console.log("MAILCHIMP_SERVER:", MAILCHIMP_SERVER);
 
-    const emailResponse = await resend.emails.send({
-      from: fromEmail || "Test <onboarding@resend.dev>",
-      to: [to],
-      subject: subject,
-      html: htmlContent,
+    if (!MAILCHIMP_API_KEY || !MAILCHIMP_SERVER) {
+      throw new Error("MAILCHIMP_API_KEY is not configured or invalid format");
+    }
+
+    // Prepare Mailchimp transactional email request
+    const mailchimpPayload = {
+      key: MAILCHIMP_API_KEY,
+      message: {
+        html: htmlContent,
+        subject: subject,
+        from_email: fromEmail || "feedback@wiseserve.net",
+        from_name: "WiseServe",
+        to: [
+          {
+            email: to,
+            type: "to"
+          }
+        ]
+      }
+    };
+
+    console.log("Sending email via Mailchimp Mandrill...");
+    
+    // Send email via Mailchimp Mandrill API
+    const response = await fetch(`https://mandrillapp.com/api/1.0/messages/send.json`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(mailchimpPayload),
     });
 
-    console.log("Resend API response:", emailResponse);
+    const emailResponse = await response.json();
+    console.log("Mailchimp API response:", emailResponse);
 
     return new Response(JSON.stringify(emailResponse), {
       status: 200,
