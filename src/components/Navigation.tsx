@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { BarChart3, MessageSquare, Settings, Home, LogOut, LogIn, User } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Home, BarChart3, MessageSquare, Settings, LogOut, LogIn, User, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 export const Navigation: React.FC = () => {
   const location = useLocation();
@@ -22,15 +23,17 @@ export const Navigation: React.FC = () => {
           .from('profiles')
           .select('role')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error('Error fetching user role:', error);
+          setUserRole('user');
         } else {
           setUserRole(data?.role || 'user');
         }
       } catch (error) {
         console.error('Error fetching user role:', error);
+        setUserRole('user');
       }
     };
 
@@ -41,8 +44,7 @@ export const Navigation: React.FC = () => {
 
   const getNavItemsForRole = () => {
     const baseItems = [
-      { path: '/admin', label: 'Dashboard', icon: Home },
-      { path: '/profile', label: 'Profile', icon: User }
+      { path: '/admin', label: 'Dashboard', icon: Home }
     ];
 
     // Don't show any role-specific items until userRole is loaded

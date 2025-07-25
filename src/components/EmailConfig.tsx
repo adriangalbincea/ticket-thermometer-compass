@@ -295,6 +295,9 @@ export const EmailConfig: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Notification Recipients */}
+      <NotificationRecipientsConfig />
+
       {/* Email Templates */}
       <Card className="shadow-elegant">
         <CardHeader>
@@ -340,9 +343,6 @@ export const EmailConfig: React.FC = () => {
           </Button>
         </CardContent>
       </Card>
-
-      {/* Notification Recipients */}
-      <NotificationRecipientsConfig />
     </div>
   );
 };
