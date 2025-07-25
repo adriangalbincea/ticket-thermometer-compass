@@ -250,6 +250,16 @@ export const LinkGenerator: React.FC = () => {
                       Test Link
                     </Button>
                   </div>
+                  
+                  {/* Pre-selection Helper */}
+                  <div className="mt-3 p-3 bg-muted/50 rounded-lg">
+                    <p className="text-xs font-medium text-foreground mb-2">Create pre-selected feedback links:</p>
+                    <div className="space-y-1 text-xs text-muted-foreground">
+                      <div>😊 Happy: <code className="bg-background px-1 rounded text-foreground">{window.location.origin}/feedback/{link.token}?type=happy</code></div>
+                      <div>😐 Neutral: <code className="bg-background px-1 rounded text-foreground">{window.location.origin}/feedback/{link.token}?type=neutral</code></div>
+                      <div>😞 Bad: <code className="bg-background px-1 rounded text-foreground">{window.location.origin}/feedback/{link.token}?type=bad</code></div>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

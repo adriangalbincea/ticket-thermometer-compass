@@ -12,6 +12,7 @@ interface FeedbackFormProps {
   ticketNumber?: string;
   technician?: string;
   ticketTitle?: string;
+  defaultFeedbackType?: FeedbackType;
   onSubmit?: (feedback: { type: FeedbackType; comment: string; ticketNumber: string; technician: string; ticketTitle: string }) => void;
 }
 
@@ -19,9 +20,10 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
   ticketNumber,
   technician,
   ticketTitle,
+  defaultFeedbackType,
   onSubmit
 }) => {
-  const [selectedFeedback, setSelectedFeedback] = useState<FeedbackType | null>(null);
+  const [selectedFeedback, setSelectedFeedback] = useState<FeedbackType | null>(defaultFeedbackType || null);
   const [comment, setComment] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [countdown, setCountdown] = useState(5);

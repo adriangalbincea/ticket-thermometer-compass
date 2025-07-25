@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { FeedbackForm, FeedbackType } from '@/components/FeedbackForm';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 
 const Feedback: React.FC = () => {
   const { token } = useParams<{ token: string }>();
+  const [searchParams] = useSearchParams();
   const [feedbackLink, setFeedbackLink] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // Get feedback type from URL parameter
+  const urlFeedbackType = searchParams.get('type') as FeedbackType | null;
+  const isValidFeedbackType = urlFeedbackType && ['bad', 'neutral', 'happy'].includes(urlFeedbackType);
 
   useEffect(() => {
     const loadFeedbackLink = async () => {
@@ -162,6 +167,7 @@ const Feedback: React.FC = () => {
             ticketNumber={feedbackLink?.ticket_number}
             technician={feedbackLink?.technician}
             ticketTitle={feedbackLink?.ticket_title}
+            defaultFeedbackType={isValidFeedbackType ? urlFeedbackType : undefined}
             onSubmit={handleFeedbackSubmit}
           />
         </div>
