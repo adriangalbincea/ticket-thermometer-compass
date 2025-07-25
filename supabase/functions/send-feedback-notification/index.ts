@@ -7,6 +7,9 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+const MAILCHIMP_API_KEY = Deno.env.get("MAILCHIMP_API_KEY");
+const MAILCHIMP_SERVER = MAILCHIMP_API_KEY?.split('-')[1]; // Extract server from API key
+
 interface FeedbackNotificationRequest {
   feedbackLinkId: string;
   feedbackType: string;
@@ -21,6 +24,8 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { feedbackLinkId, feedbackType, comment }: FeedbackNotificationRequest = await req.json();
+
+    console.log("Processing feedback notification for:", { feedbackLinkId, feedbackType });
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -84,6 +89,15 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Validate Mailchimp configuration
+    if (!MAILCHIMP_API_KEY || !MAILCHIMP_SERVER) {
+      console.error('Mailchimp API key not configured or invalid format');
+      return new Response(
+        JSON.stringify({ error: 'Mailchimp API key not configured' }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     // Prepare email content
     const subject = settingsMap.get('template_notification_subject') || 'New Feedback Received - Ticket #{ticket_number}';
     const htmlTemplate = settingsMap.get('template_notification_html') || `
@@ -120,22 +134,42 @@ const handler = async (req: Request): Promise<Response> => {
       .replace(/{feedback_type}/g, feedbackType)
       .replace(/{comment}/g, comment || 'No comment provided');
 
-    // Send emails to all active recipients using the configured SMTP settings
+    const fromEmail = settingsMap.get('api_from_email') || 'feedback@wiseserve.net';
+
+    // Send emails to all active recipients using Mailchimp API
     const emailPromises = recipients.map(async (recipient) => {
       try {
-        // Call the send-test-email function with notification content
-        const emailResponse = await supabase.functions.invoke('send-test-email', {
-          body: {
-            to: recipient.email,
+        console.log(`Sending notification email to ${recipient.email}`);
+
+        const mailchimpPayload = {
+          key: MAILCHIMP_API_KEY,
+          message: {
+            html: finalHtmlContent,
             subject: finalSubject,
-            htmlContent: finalHtmlContent,
-            fromEmail: settingsMap.get('smtp_username') ? `WiseServe <${settingsMap.get('smtp_username')}>` : undefined,
+            from_email: fromEmail,
+            from_name: "WiseServe",
+            to: [
+              {
+                email: recipient.email,
+                type: "to"
+              }
+            ]
+          }
+        };
+
+        const response = await fetch(`https://mandrillapp.com/api/1.0/messages/send.json`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
           },
+          body: JSON.stringify(mailchimpPayload),
         });
 
-        if (emailResponse.error) {
-          console.error(`Failed to send email to ${recipient.email}:`, emailResponse.error);
-          return { recipient: recipient.email, success: false, error: emailResponse.error };
+        const emailResponse = await response.json();
+        console.log(`Mailchimp API response for ${recipient.email}:`, emailResponse);
+
+        if (!response.ok) {
+          throw new Error(`Mailchimp API error: ${JSON.stringify(emailResponse)}`);
         }
 
         console.log(`Email sent successfully to ${recipient.email}`);

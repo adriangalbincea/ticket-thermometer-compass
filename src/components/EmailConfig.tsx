@@ -4,19 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Mail, Send } from 'lucide-react';
+import { Mail, Send, Key } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { NotificationRecipientsConfig } from './NotificationRecipientsConfig';
 
 interface EmailSettings {
-  smtpHost: string;
-  smtpPort: string;
-  smtpUsername: string;
-  smtpPassword: string;
-  smtpFromEmail: string;
-  useTLS: boolean;
+  fromEmail: string;
   notificationSubject: string;
   notificationTemplate: string;
   reminderSubject: string;
@@ -26,12 +20,7 @@ interface EmailSettings {
 export const EmailConfig: React.FC = () => {
   const { toast } = useToast();
   const [settings, setSettings] = useState<EmailSettings>({
-    smtpHost: '',
-    smtpPort: '587',
-    smtpUsername: '',
-    smtpPassword: '',
-    smtpFromEmail: '',
-    useTLS: true,
+    fromEmail: '',
     notificationSubject: '',
     notificationTemplate: '',
     reminderSubject: '',
@@ -69,12 +58,7 @@ export const EmailConfig: React.FC = () => {
       });
 
       setSettings({
-        smtpHost: settingsMap.get('smtp_host') || '',
-        smtpPort: settingsMap.get('smtp_port') || '587',
-        smtpUsername: settingsMap.get('smtp_username') || '',
-        smtpPassword: settingsMap.get('smtp_password') ? atob(settingsMap.get('smtp_password') || '') : '', // Base64 decode password
-        smtpFromEmail: settingsMap.get('smtp_from_email') || '',
-        useTLS: settingsMap.get('smtp_use_tls') === 'true',
+        fromEmail: settingsMap.get('api_from_email') || 'feedback@wiseserve.net',
         notificationSubject: settingsMap.get('template_notification_subject') || 'New Feedback Received - Ticket #{ticket_number}',
         notificationTemplate: settingsMap.get('template_notification_html') || '<h1>New Feedback</h1><p>A new feedback has been submitted for ticket {ticket_number} by {customer_name}...</p>',
         reminderSubject: settingsMap.get('template_reminder_subject') || 'Please provide feedback for ticket #{ticket_number}',
@@ -92,19 +76,14 @@ export const EmailConfig: React.FC = () => {
     }
   };
 
-  const handleSaveEmailSettings = async (type: 'smtp' | 'templates') => {
+  const handleSaveEmailSettings = async (type: 'api' | 'templates') => {
     setSaving(true);
     try {
       const settingsToSave = [];
 
-      if (type === 'smtp') {
+      if (type === 'api') {
         settingsToSave.push(
-          { setting_type: 'smtp', setting_key: 'host', setting_value: settings.smtpHost },
-          { setting_type: 'smtp', setting_key: 'port', setting_value: settings.smtpPort },
-          { setting_type: 'smtp', setting_key: 'username', setting_value: settings.smtpUsername },
-          { setting_type: 'smtp', setting_key: 'password', setting_value: btoa(settings.smtpPassword) }, // Base64 encode password
-          { setting_type: 'smtp', setting_key: 'from_email', setting_value: settings.smtpFromEmail },
-          { setting_type: 'smtp', setting_key: 'use_tls', setting_value: settings.useTLS.toString() }
+          { setting_type: 'api', setting_key: 'from_email', setting_value: settings.fromEmail }
         );
       } else {
         settingsToSave.push(
@@ -130,7 +109,7 @@ export const EmailConfig: React.FC = () => {
 
       toast({
         title: "Settings Saved",
-        description: `${type === 'smtp' ? 'SMTP' : 'Email template'} settings have been updated successfully.`,
+        description: `${type === 'api' ? 'Email' : 'Email template'} settings have been updated successfully.`,
       });
     } catch (error) {
       console.error('Error saving email settings:', error);
@@ -160,8 +139,8 @@ export const EmailConfig: React.FC = () => {
         body: {
           to: testEmail,
           subject: 'Test Email from WiseServe',
-          htmlContent: '<h1>Test Email</h1><p>This is a test email to verify your SMTP configuration.</p><p>If you received this email, your email settings are working correctly!</p>',
-          fromEmail: settings.smtpFromEmail || `WiseServe <${settings.smtpUsername}>`,
+          htmlContent: '<h1>Test Email</h1><p>This is a test email to verify your Mailchimp configuration.</p><p>If you received this email, your email settings are working correctly!</p>',
+          fromEmail: settings.fromEmail,
         },
       });
 
@@ -177,7 +156,7 @@ export const EmailConfig: React.FC = () => {
       console.error('Error sending test email:', error);
       toast({
         title: "Error",
-        description: "Failed to send test email. Please check your SMTP settings.",
+        description: "Failed to send test email. Please check your Mailchimp API configuration.",
         variant: "destructive",
       });
     } finally {
@@ -195,86 +174,27 @@ export const EmailConfig: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* SMTP Configuration */}
+      {/* Email API Configuration */}
       <Card className="shadow-elegant">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Mail className="h-5 w-5" />
-            SMTP Configuration
+            <Key className="h-5 w-5" />
+            Email Configuration
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="smtp-host">SMTP Host</Label>
-              <Input
-                id="smtp-host"
-                placeholder="smtp.gmail.com"
-                value={settings.smtpHost}
-                onChange={(e) => setSettings(prev => ({ ...prev, smtpHost: e.target.value }))}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="smtp-port">SMTP Port</Label>
-              <Input
-                id="smtp-port"
-                type="number"
-                placeholder="587"
-                value={settings.smtpPort}
-                onChange={(e) => setSettings(prev => ({ ...prev, smtpPort: e.target.value }))}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="smtp-username">Username</Label>
-              <Input
-                id="smtp-username"
-                placeholder="your-email@gmail.com"
-                value={settings.smtpUsername}
-                onChange={(e) => setSettings(prev => ({ ...prev, smtpUsername: e.target.value }))}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="smtp-password">Password</Label>
-              <Input
-                id="smtp-password"
-                type="password"
-                placeholder="Your app password"
-                value={settings.smtpPassword}
-                onChange={(e) => setSettings(prev => ({ ...prev, smtpPassword: e.target.value }))}
-              />
-            </div>
-          </div>
-
           <div className="space-y-2">
-            <Label htmlFor="smtp-from">From Email</Label>
+            <Label htmlFor="from-email">From Email Address</Label>
             <Input
-              id="smtp-from"
+              id="from-email"
               type="email"
-              placeholder="support@yourcompany.com"
-              value={settings.smtpFromEmail}
-              onChange={(e) => setSettings(prev => ({ ...prev, smtpFromEmail: e.target.value }))}
+              placeholder="feedback@wiseserve.net"
+              value={settings.fromEmail}
+              onChange={(e) => setSettings(prev => ({ ...prev, fromEmail: e.target.value }))}
             />
             <p className="text-sm text-muted-foreground">
               The email address that will appear as the sender
             </p>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>Use TLS/SSL</Label>
-              <p className="text-sm text-muted-foreground">
-                Enable secure connection for email sending
-              </p>
-            </div>
-            <Switch 
-              checked={settings.useTLS} 
-              onCheckedChange={(checked) => setSettings(prev => ({ ...prev, useTLS: checked }))}
-            />
           </div>
 
           <div className="space-y-4">
@@ -291,11 +211,11 @@ export const EmailConfig: React.FC = () => {
             
             <div className="flex gap-2">
               <Button 
-                onClick={() => handleSaveEmailSettings('smtp')} 
+                onClick={() => handleSaveEmailSettings('api')} 
                 className="bg-gradient-primary"
                 disabled={saving}
               >
-                {saving ? 'Saving...' : 'Save SMTP Settings'}
+                {saving ? 'Saving...' : 'Save Email Settings'}
               </Button>
               <Button variant="outline" onClick={handleTestEmail} disabled={saving}>
                 <Send className="h-4 w-4 mr-2" />
@@ -303,13 +223,23 @@ export const EmailConfig: React.FC = () => {
               </Button>
             </div>
           </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-sm text-blue-800">
+              <strong>Note:</strong> This system uses Mailchimp API for sending emails. 
+              Make sure your MAILCHIMP_API_KEY is configured in the project secrets.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
       {/* Email Templates */}
       <Card className="shadow-elegant">
         <CardHeader>
-          <CardTitle>Email Templates</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Mail className="h-5 w-5" />
+            Email Templates
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
