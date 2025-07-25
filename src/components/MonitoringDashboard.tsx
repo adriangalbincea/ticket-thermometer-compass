@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RefreshCw, Download, User, Star, TrendingUp, BarChart3 } from 'lucide-react';
+import { User, Star, TrendingUp, BarChart3 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -140,40 +140,6 @@ export const MonitoringDashboard: React.FC = () => {
     ? Math.round((totalStats.totalHappy / totalStats.totalFeedback) * 100)
     : 0;
 
-  const handleRefresh = () => {
-    loadTechnicianData();
-    toast({
-      title: "Data Refreshed",
-      description: "Technician monitoring data has been updated.",
-    });
-  };
-
-  const handleExport = () => {
-    const csvContent = [
-      ['Technician', 'Total Feedback', 'Happy', 'Neutral', 'Unhappy', 'Satisfaction Rate'],
-      ...filteredData.map(data => [
-        data.technician,
-        data.totalFeedback,
-        data.happyCount,
-        data.neutralCount,
-        data.unhappyCount,
-        `${data.satisfactionRate}%`
-      ])
-    ].map(row => row.join(',')).join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('href', url);
-    a.setAttribute('download', `technician-monitoring-${new Date().toISOString().split('T')[0]}.csv`);
-    a.click();
-    window.URL.revokeObjectURL(url);
-
-    toast({
-      title: "Export Complete",
-      description: "Technician monitoring data has been exported.",
-    });
-  };
 
   if (loading) {
     return (
@@ -184,22 +150,7 @@ export const MonitoringDashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header with actions */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex items-center gap-4">
-          <Button onClick={handleRefresh} variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-          <Button onClick={handleExport} variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export CSV
-          </Button>
-        </div>
-      </div>
-
-      {/* KPI Cards */}
+    <div className="space-y-6">{/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="shadow-elegant">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
