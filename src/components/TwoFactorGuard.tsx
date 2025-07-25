@@ -24,7 +24,10 @@ export const TwoFactorGuard: React.FC<TwoFactorGuardProps> = ({ children }) => {
       }
 
       // If we've already checked and user has 2FA verified in session, skip the check
-      if (hasChecked && sessionStorage.getItem(`2fa_verified_${user.id}`)) {
+      const sessionKey = `2fa_verified_${user.id}`;
+      const isSessionVerified = sessionStorage.getItem(sessionKey) === 'true';
+      
+      if (hasChecked && isSessionVerified) {
         setLoading(false);
         setNeedsTwoFA(false);
         return;
@@ -38,11 +41,9 @@ export const TwoFactorGuard: React.FC<TwoFactorGuardProps> = ({ children }) => {
         console.log('TwoFactorGuard: 2FA required:', requires2FA);
         
         if (requires2FA) {
-          // Check if user has completed 2FA in this session
-          const sessionStorage2FA = sessionStorage.getItem(`2fa_verified_${user.id}`);
-          console.log('TwoFactorGuard: Session 2FA status:', sessionStorage2FA);
+          console.log('TwoFactorGuard: Session 2FA status:', isSessionVerified);
           
-          if (!sessionStorage2FA) {
+          if (!isSessionVerified) {
             // Check if user has 2FA enabled
             const { data: userTwoFA } = await supabase
               .from('user_2fa')
@@ -72,8 +73,14 @@ export const TwoFactorGuard: React.FC<TwoFactorGuardProps> = ({ children }) => {
       }
     };
 
-    checkTwoFARequirement();
-  }, [user, check2FARequirement, hasChecked]);
+    // Only run the check if we haven't checked yet or if the user changed
+    if (!hasChecked || !sessionStorage.getItem(`2fa_verified_${user?.id}`)) {
+      checkTwoFARequirement();
+    } else {
+      setLoading(false);
+      setNeedsTwoFA(false);
+    }
+  }, [user, check2FARequirement]);
 
   const handle2FASuccess = async () => {
     console.log('TwoFactorGuard: 2FA verified successfully');

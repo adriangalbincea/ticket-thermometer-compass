@@ -11,6 +11,7 @@ import GenerateLinks from "./pages/GenerateLinks";
 import Feedback from "./pages/Feedback";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
+import MonitoringBoard from "./pages/MonitoringBoard";
 import Config from "./pages/Config";
 import ApiTestGuide from "./pages/ApiTestGuide";
 import NotFound from "./pages/NotFound";
@@ -38,6 +39,11 @@ const AppRoutes = () => {
           <TwoFactorGuard>
             <Admin />
           </TwoFactorGuard>
+        </ProtectedRoute>
+      } />
+      <Route path="/monitoring" element={
+        <ProtectedRoute>
+          <MonitoringBoard />
         </ProtectedRoute>
       } />
       <Route path="/feedback/:token" element={<Feedback />} />

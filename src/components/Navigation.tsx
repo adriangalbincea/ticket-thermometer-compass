@@ -41,6 +41,7 @@ export const Navigation: React.FC = () => {
 
   const protectedNavItems = [
     { path: '/admin', label: 'Dashboard', icon: Home },
+    { path: '/monitoring', label: 'Monitoring Board', icon: BarChart3 },
     { path: '/generate-links', label: 'Generate Links', icon: MessageSquare },
     { path: '/profile', label: 'Profile', icon: User },
     ...(userRole === 'admin' ? [{ path: '/config', label: 'Configuration', icon: Settings }] : [])
