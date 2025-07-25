@@ -117,6 +117,15 @@ export const UserProfile: React.FC = () => {
     setLoading(true);
 
     try {
+      if (!currentPassword) {
+        toast({
+          title: "Current Password Required",
+          description: "Please enter your current password to proceed.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (!isPasswordValid) {
         toast({
           title: "Invalid Password",
@@ -130,6 +139,21 @@ export const UserProfile: React.FC = () => {
         toast({
           title: "Passwords Don't Match",
           description: "Please ensure both password fields match.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Verify current password by attempting to sign in
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email: user?.email || '',
+        password: currentPassword,
+      });
+
+      if (verifyError) {
+        toast({
+          title: "Current Password Incorrect",
+          description: "The current password you entered is incorrect.",
           variant: "destructive",
         });
         return;
@@ -252,6 +276,18 @@ export const UserProfile: React.FC = () => {
         <CardContent>
           <form onSubmit={handlePasswordChange} className="space-y-4">
             <div className="space-y-2">
+              <Label htmlFor="current-password">Current Password</Label>
+              <Input
+                id="current-password"
+                type="password"
+                placeholder="Enter current password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="new-password">New Password</Label>
               <Input
                 id="new-password"
@@ -343,7 +379,7 @@ export const UserProfile: React.FC = () => {
             <Button 
               type="submit" 
               className="w-full bg-gradient-primary" 
-              disabled={loading || !isPasswordValid || !passwordsMatch || !newPassword || !confirmPassword}
+              disabled={loading || !isPasswordValid || !passwordsMatch || !newPassword || !confirmPassword || !currentPassword}
             >
               {loading ? "Updating Password..." : "Update Password"}
             </Button>
