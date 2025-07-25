@@ -271,16 +271,16 @@ export const EmailTemplateDesigner: React.FC<EmailTemplateDesignerProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Tabs value={mode} onValueChange={(value) => setMode(value as 'design' | 'html')}>
-        <div className="flex items-center justify-between">
-          <TabsList className="grid w-64 grid-cols-2">
-            <TabsTrigger value="design" className="flex items-center gap-2">
-              <Palette className="h-4 w-4" />
+        <div className="flex items-center justify-between mb-4">
+          <TabsList className="grid w-48 grid-cols-2">
+            <TabsTrigger value="design" className="flex items-center gap-1 text-sm">
+              <Palette className="h-3 w-3" />
               Design
             </TabsTrigger>
-            <TabsTrigger value="html" className="flex items-center gap-2">
-              <Code className="h-4 w-4" />
+            <TabsTrigger value="html" className="flex items-center gap-1 text-sm">
+              <Code className="h-3 w-3" />
               HTML
             </TabsTrigger>
           </TabsList>
@@ -290,39 +290,37 @@ export const EmailTemplateDesigner: React.FC<EmailTemplateDesignerProps> = ({
               variant="outline"
               size="sm"
               onClick={resetToDefault}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1 text-sm"
             >
-              <RotateCcw className="h-4 w-4" />
-              Reset to Default
+              <RotateCcw className="h-3 w-3" />
+              Reset
             </Button>
           )}
         </div>
 
-        <TabsContent value="design" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Design Controls - Left Column */}
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Layout className="h-4 w-4" />
-                    Layout
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="header-text">Header Text</Label>
+        <TabsContent value="design" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            {/* Compact Design Controls */}
+            <div className="space-y-4">
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium flex items-center gap-1">
+                  <Layout className="h-3 w-3" />
+                  Layout
+                </h4>
+                <div className="space-y-2">
+                  <div>
+                    <Label htmlFor="header-text" className="text-xs">Header Text</Label>
                     <Input
                       id="header-text"
+                      className="h-8 text-sm"
                       value={settings.headerText}
                       onChange={(e) => handleSettingChange('headerText', e.target.value)}
                     />
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="border-radius">Border Radius</Label>
+                  <div>
+                    <Label htmlFor="border-radius" className="text-xs">Radius</Label>
                     <Select value={settings.borderRadius} onValueChange={(value) => handleSettingChange('borderRadius', value)}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-8 text-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -333,60 +331,56 @@ export const EmailTemplateDesigner: React.FC<EmailTemplateDesignerProps> = ({
                       </SelectContent>
                     </Select>
                   </div>
-
                   <div className="flex items-center space-x-2">
                     <Switch
                       id="show-emojis"
                       checked={settings.showEmojis}
                       onCheckedChange={(checked) => handleSettingChange('showEmojis', checked)}
                     />
-                    <Label htmlFor="show-emojis">Show Emojis</Label>
+                    <Label htmlFor="show-emojis" className="text-xs">Emojis</Label>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Palette className="h-4 w-4" />
-                    Colors
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="accent-color">Accent Color</Label>
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium flex items-center gap-1">
+                  <Palette className="h-3 w-3" />
+                  Colors
+                </h4>
+                <div className="space-y-2">
+                  <div>
+                    <Label htmlFor="accent-color" className="text-xs">Accent</Label>
                     <Input
                       id="accent-color"
                       type="color"
+                      className="h-8"
                       value={settings.accentColor}
                       onChange={(e) => handleSettingChange('accentColor', e.target.value)}
                     />
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="text-color">Text Color</Label>
+                  <div>
+                    <Label htmlFor="text-color" className="text-xs">Text</Label>
                     <Input
                       id="text-color"
                       type="color"
+                      className="h-8"
                       value={settings.textColor}
                       onChange={(e) => handleSettingChange('textColor', e.target.value)}
                     />
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Type className="h-4 w-4" />
-                    Typography
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="font-family">Font Family</Label>
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium flex items-center gap-1">
+                  <Type className="h-3 w-3" />
+                  Typography
+                </h4>
+                <div className="space-y-2">
+                  <div>
+                    <Label htmlFor="font-family" className="text-xs">Font</Label>
                     <Select value={settings.fontFamily} onValueChange={(value) => handleSettingChange('fontFamily', value)}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-8 text-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -397,69 +391,60 @@ export const EmailTemplateDesigner: React.FC<EmailTemplateDesignerProps> = ({
                       </SelectContent>
                     </Select>
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="font-size">Font Size</Label>
+                  <div>
+                    <Label htmlFor="font-size" className="text-xs">Size</Label>
                     <Select value={settings.fontSize} onValueChange={(value) => handleSettingChange('fontSize', value)}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-8 text-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="14px">Small (14px)</SelectItem>
-                        <SelectItem value="16px">Medium (16px)</SelectItem>
-                        <SelectItem value="18px">Large (18px)</SelectItem>
+                        <SelectItem value="14px">Small</SelectItem>
+                        <SelectItem value="16px">Medium</SelectItem>
+                        <SelectItem value="18px">Large</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
 
-            {/* Preview - Right Columns */}
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Eye className="h-4 w-4" />
-                    Live Preview
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="border rounded-lg bg-gray-50 max-h-96 overflow-y-auto">
-                    <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Preview */}
+            <div className="lg:col-span-3">
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium flex items-center gap-1">
+                  <Eye className="h-3 w-3" />
+                  Live Preview
+                </h4>
+                <div className="border rounded-lg bg-gray-50 h-80 overflow-y-auto">
+                  <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+                </div>
+              </div>
             </div>
           </div>
         </TabsContent>
 
-        <TabsContent value="html" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent value="html" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="html-content">HTML Template</Label>
+              <Label htmlFor="html-content" className="text-sm font-medium">HTML Template</Label>
               <Textarea
                 id="html-content"
                 placeholder="Enter your HTML template here..."
-                className="min-h-[400px] font-mono text-sm"
+                className="h-80 font-mono text-xs"
                 value={htmlContent}
                 onChange={(e) => handleHtmlChange(e.target.value)}
               />
             </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Eye className="h-4 w-4" />
-                  Preview
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="border rounded-lg bg-gray-50 max-h-96 overflow-y-auto">
-                  <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
-                </div>
-              </CardContent>
-            </Card>
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium flex items-center gap-1">
+                <Eye className="h-3 w-3" />
+                Preview
+              </h4>
+              <div className="border rounded-lg bg-gray-50 h-80 overflow-y-auto">
+                <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+              </div>
+            </div>
           </div>
         </TabsContent>
       </Tabs>

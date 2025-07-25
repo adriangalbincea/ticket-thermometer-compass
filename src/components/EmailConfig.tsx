@@ -318,8 +318,8 @@ export const EmailConfig: React.FC = () => {
             />
           </div>
 
-          <div className="space-y-4">
-            <Label>Notification Email Template Designer</Label>
+          <div className="space-y-2">
+            <Label htmlFor="notification-template">Notification Email Template</Label>
             <EmailTemplateDesigner
               template={settings.notificationTemplate}
               onChange={(template) => setSettings(prev => ({ ...prev, notificationTemplate: template }))}
