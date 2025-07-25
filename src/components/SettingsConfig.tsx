@@ -15,12 +15,8 @@ export const SettingsConfig: React.FC = () => {
   const [settings, setSettings] = useState({
     company_name: '',
     support_email: '',
-    auto_archive: false,
-    email_notifications: false,
     session_timeout: '1',
-    two_factor_auth: false,
-    ip_whitelist: false,
-    ip_whitelist_addresses: ''
+    two_factor_auth: false
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -47,12 +43,8 @@ export const SettingsConfig: React.FC = () => {
         setSettings({
           company_name: settingsMap.company_name || '',
           support_email: settingsMap.support_email || '',
-          auto_archive: settingsMap.auto_archive === 'true',
-          email_notifications: settingsMap.email_notifications === 'true',
           session_timeout: settingsMap.session_timeout || '1',
-          two_factor_auth: settingsMap.two_factor_auth === 'true',
-          ip_whitelist: settingsMap.ip_whitelist === 'true',
-          ip_whitelist_addresses: settingsMap.ip_whitelist_addresses || ''
+          two_factor_auth: settingsMap.two_factor_auth === 'true'
         });
       }
     } catch (error: any) {
@@ -72,12 +64,8 @@ export const SettingsConfig: React.FC = () => {
       const settingsToSave = [
         { setting_key: 'company_name', setting_value: settings.company_name },
         { setting_key: 'support_email', setting_value: settings.support_email },
-        { setting_key: 'auto_archive', setting_value: settings.auto_archive.toString() },
-        { setting_key: 'email_notifications', setting_value: settings.email_notifications.toString() },
         { setting_key: 'session_timeout', setting_value: settings.session_timeout },
-        { setting_key: 'two_factor_auth', setting_value: settings.two_factor_auth.toString() },
-        { setting_key: 'ip_whitelist', setting_value: settings.ip_whitelist.toString() },
-        { setting_key: 'ip_whitelist_addresses', setting_value: settings.ip_whitelist_addresses }
+        { setting_key: 'two_factor_auth', setting_value: settings.two_factor_auth.toString() }
       ];
 
       for (const setting of settingsToSave) {
@@ -145,34 +133,6 @@ export const SettingsConfig: React.FC = () => {
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Auto-archive old feedback</Label>
-                <p className="text-sm text-muted-foreground">
-                  Automatically archive feedback older than 90 days
-                </p>
-              </div>
-              <Switch 
-                checked={settings.auto_archive}
-                onCheckedChange={(checked) => setSettings(prev => ({ ...prev, auto_archive: checked }))}
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Email notifications</Label>
-                <p className="text-sm text-muted-foreground">
-                  Send email alerts for new feedback submissions
-                </p>
-              </div>
-              <Switch 
-                checked={settings.email_notifications}
-                onCheckedChange={(checked) => setSettings(prev => ({ ...prev, email_notifications: checked }))}
-              />
-            </div>
-          </div>
-
           <Button onClick={handleSaveSettings} className="bg-gradient-primary" disabled={saving}>
             {saving ? "Saving..." : "Save General Settings"}
           </Button>
@@ -216,37 +176,6 @@ export const SettingsConfig: React.FC = () => {
                 checked={settings.two_factor_auth}
                 onCheckedChange={(checked) => setSettings(prev => ({ ...prev, two_factor_auth: checked }))}
               />
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>IP Whitelist</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Restrict admin access to specific IP addresses
-                  </p>
-                </div>
-                <Switch 
-                  checked={settings.ip_whitelist}
-                  onCheckedChange={(checked) => setSettings(prev => ({ ...prev, ip_whitelist: checked }))}
-                />
-              </div>
-
-              {settings.ip_whitelist && (
-                <div className="space-y-2">
-                  <Label htmlFor="ip-addresses">Allowed IP Addresses</Label>
-                  <Textarea
-                    id="ip-addresses"
-                    placeholder="192.168.1.100&#10;203.0.113.42&#10;2001:db8::1&#10;&#10;Enter one IP address per line. Supports IPv4 and IPv6 addresses."
-                    value={settings.ip_whitelist_addresses}
-                    onChange={(e) => setSettings(prev => ({ ...prev, ip_whitelist_addresses: e.target.value }))}
-                    className="min-h-[120px] font-mono text-sm"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Enter one IP address per line. Supports both IPv4 (e.g., 192.168.1.100) and IPv6 (e.g., 2001:db8::1) addresses.
-                  </p>
-                </div>
-              )}
             </div>
           </div>
 
