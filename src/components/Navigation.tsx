@@ -39,13 +39,37 @@ export const Navigation: React.FC = () => {
   
   const publicNavItems: any[] = [];
 
-  const protectedNavItems = [
-    { path: '/admin', label: 'Dashboard', icon: Home },
-    { path: '/monitoring', label: 'Monitoring Board', icon: BarChart3 },
-    { path: '/generate-links', label: 'Generate Links', icon: MessageSquare },
-    { path: '/profile', label: 'Profile', icon: User },
-    ...(userRole === 'admin' ? [{ path: '/config', label: 'Configuration', icon: Settings }] : [])
-  ];
+  const getNavItemsForRole = () => {
+    const baseItems = [
+      { path: '/admin', label: 'Dashboard', icon: Home },
+      { path: '/profile', label: 'Profile', icon: User }
+    ];
+
+    if (userRole === 'monitoring') {
+      return [
+        ...baseItems,
+        { path: '/monitoring', label: 'Monitoring Board', icon: BarChart3 }
+      ];
+    }
+
+    if (userRole === 'admin') {
+      return [
+        ...baseItems,
+        { path: '/monitoring', label: 'Monitoring Board', icon: BarChart3 },
+        { path: '/generate-links', label: 'Generate Links', icon: MessageSquare },
+        { path: '/config', label: 'Configuration', icon: Settings }
+      ];
+    }
+
+    // Default for 'user' role - all except config
+    return [
+      ...baseItems,
+      { path: '/monitoring', label: 'Monitoring Board', icon: BarChart3 },
+      { path: '/generate-links', label: 'Generate Links', icon: MessageSquare }
+    ];
+  };
+
+  const protectedNavItems = getNavItemsForRole();
 
   const handleSignOut = async () => {
     await signOut();

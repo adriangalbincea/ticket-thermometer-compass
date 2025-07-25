@@ -15,6 +15,7 @@ interface EmailSettings {
   smtpPort: string;
   smtpUsername: string;
   smtpPassword: string;
+  smtpFromEmail: string;
   useTLS: boolean;
   notificationSubject: string;
   notificationTemplate: string;
@@ -29,6 +30,7 @@ export const EmailConfig: React.FC = () => {
     smtpPort: '587',
     smtpUsername: '',
     smtpPassword: '',
+    smtpFromEmail: '',
     useTLS: true,
     notificationSubject: '',
     notificationTemplate: '',
@@ -71,6 +73,7 @@ export const EmailConfig: React.FC = () => {
         smtpPort: settingsMap.get('smtp_port') || '587',
         smtpUsername: settingsMap.get('smtp_username') || '',
         smtpPassword: settingsMap.get('smtp_password') ? atob(settingsMap.get('smtp_password') || '') : '', // Base64 decode password
+        smtpFromEmail: settingsMap.get('smtp_from_email') || '',
         useTLS: settingsMap.get('smtp_use_tls') === 'true',
         notificationSubject: settingsMap.get('template_notification_subject') || 'New Feedback Received - Ticket #{ticket_number}',
         notificationTemplate: settingsMap.get('template_notification_html') || '<h1>New Feedback</h1><p>A new feedback has been submitted for ticket {ticket_number} by {customer_name}...</p>',
@@ -100,6 +103,7 @@ export const EmailConfig: React.FC = () => {
           { setting_type: 'smtp', setting_key: 'port', setting_value: settings.smtpPort },
           { setting_type: 'smtp', setting_key: 'username', setting_value: settings.smtpUsername },
           { setting_type: 'smtp', setting_key: 'password', setting_value: btoa(settings.smtpPassword) }, // Base64 encode password
+          { setting_type: 'smtp', setting_key: 'from_email', setting_value: settings.smtpFromEmail },
           { setting_type: 'smtp', setting_key: 'use_tls', setting_value: settings.useTLS.toString() }
         );
       } else {
@@ -157,7 +161,7 @@ export const EmailConfig: React.FC = () => {
           to: testEmail,
           subject: 'Test Email from WiseServe',
           htmlContent: '<h1>Test Email</h1><p>This is a test email to verify your SMTP configuration.</p><p>If you received this email, your email settings are working correctly!</p>',
-          fromEmail: settings.smtpUsername ? `WiseServe <${settings.smtpUsername}>` : undefined,
+          fromEmail: settings.smtpFromEmail || `WiseServe <${settings.smtpUsername}>`,
         },
       });
 
@@ -244,6 +248,20 @@ export const EmailConfig: React.FC = () => {
                 onChange={(e) => setSettings(prev => ({ ...prev, smtpPassword: e.target.value }))}
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="smtp-from">From Email</Label>
+            <Input
+              id="smtp-from"
+              type="email"
+              placeholder="support@yourcompany.com"
+              value={settings.smtpFromEmail}
+              onChange={(e) => setSettings(prev => ({ ...prev, smtpFromEmail: e.target.value }))}
+            />
+            <p className="text-sm text-muted-foreground">
+              The email address that will appear as the sender
+            </p>
           </div>
 
           <div className="flex items-center justify-between">

@@ -175,7 +175,8 @@ export const UserManagement: React.FC = () => {
   const getRoleBadge = (role: string) => {
     const variants = {
       admin: 'bg-red-100 text-red-800',
-      user: 'bg-blue-100 text-blue-800'
+      user: 'bg-blue-100 text-blue-800',
+      monitoring: 'bg-green-100 text-green-800'
     };
     return variants[role as keyof typeof variants] || 'bg-gray-100 text-gray-800';
   };
@@ -248,6 +249,7 @@ export const UserManagement: React.FC = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="monitoring">Monitoring</SelectItem>
                     <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
