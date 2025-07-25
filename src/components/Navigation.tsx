@@ -45,6 +45,11 @@ export const Navigation: React.FC = () => {
       { path: '/profile', label: 'Profile', icon: User }
     ];
 
+    // Don't show any role-specific items until userRole is loaded
+    if (!userRole) {
+      return baseItems;
+    }
+
     if (userRole === 'monitoring') {
       return [
         ...baseItems,

@@ -25,8 +25,25 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { to, subject, htmlContent, fromEmail }: TestEmailRequest = await req.json();
 
-    console.log("Attempting to send email with:", { to, subject, fromEmail });
-    console.log("RESEND_API_KEY exists:", !!Deno.env.get("RESEND_API_KEY"));
+    // Validate input
+    if (!to || !subject || !htmlContent) {
+      console.error("Missing required fields:", { to: !!to, subject: !!subject, htmlContent: !!htmlContent });
+      return new Response(
+        JSON.stringify({ error: "Missing required fields: to, subject, and htmlContent are required" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    console.log("Attempting to send email with:", { 
+      to, 
+      subject, 
+      fromEmail: fromEmail || "Test <onboarding@resend.dev>",
+      hasContent: !!htmlContent
+    });
+    console.log("RESEND_API_KEY configured:", !!Deno.env.get("RESEND_API_KEY"));
 
     const emailResponse = await resend.emails.send({
       from: fromEmail || "Test <onboarding@resend.dev>",
@@ -35,7 +52,7 @@ const handler = async (req: Request): Promise<Response> => {
       html: htmlContent,
     });
 
-    console.log("Test email sent successfully:", emailResponse);
+    console.log("Resend API response:", emailResponse);
 
     return new Response(JSON.stringify(emailResponse), {
       status: 200,
