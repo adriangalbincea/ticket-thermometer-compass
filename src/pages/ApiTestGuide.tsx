@@ -29,13 +29,15 @@ const ApiTestGuide: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer YOUR_TOKEN_HERE',
         },
         body: JSON.stringify({
           ticket_number: 'TEST-' + Date.now(),
           technician: 'Test User',
           ticket_title: 'API Test from Guide',
           customer_email: 'test@example.com',
-          customer_name: 'Test Customer'
+          customer_name: 'Test Customer',
+          expires_hours: 72
         })
       });
 
@@ -68,6 +70,7 @@ const ApiTestGuide: React.FC = () => {
 
   const curlExample = `curl -X POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link \\
   -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer <your-token>" \\
   -d '{
     "ticket_number": "TK-12345",
     "technician": "John Doe",
@@ -77,11 +80,12 @@ const ApiTestGuide: React.FC = () => {
     "expires_hours": 48
   }'`;
 
-  const jsExample = `const generateFeedbackLink = async (ticketData) => {
+  const jsExample = `const generateFeedbackLink = async (ticketData, apiToken) => {
   const response = await fetch('https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': \`Bearer \${apiToken}\`,
     },
     body: JSON.stringify({
       ticket_number: ticketData.ticketNumber,
@@ -89,7 +93,7 @@ const ApiTestGuide: React.FC = () => {
       ticket_title: ticketData.title,
       customer_email: ticketData.customerEmail,
       customer_name: ticketData.customerName,
-      expires_hours: 72
+      expires_hours: ticketData.expiresHours
     })
   });
 
@@ -107,19 +111,24 @@ const ApiTestGuide: React.FC = () => {
   const pythonExample = `import requests
 import json
 
-def generate_feedback_link(ticket_data):
+def generate_feedback_link(ticket_data, api_token):
     url = "https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link"
     
     payload = {
         "ticket_number": ticket_data["ticket_number"],
         "technician": ticket_data["technician"], 
         "ticket_title": ticket_data["ticket_title"],
-        "customer_email": ticket_data.get("customer_email"),
-        "customer_name": ticket_data.get("customer_name"),
-        "expires_hours": ticket_data.get("expires_hours", 72)
+        "customer_email": ticket_data["customer_email"],
+        "customer_name": ticket_data["customer_name"],
+        "expires_hours": ticket_data["expires_hours"]
     }
     
-    response = requests.post(url, json=payload)
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {api_token}'
+    }
+    
+    response = requests.post(url, json=payload, headers=headers)
     result = response.json()
     
     if result.get("success"):
@@ -181,13 +190,14 @@ def generate_feedback_link(ticket_data):
                   </h4>
                   <div className="relative">
                     <pre className="bg-muted p-4 rounded-md text-sm overflow-auto">
-                      {`curl https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link`}
+                      {`curl https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link \\
+  -H "Authorization: Bearer <your-token>"`}
                     </pre>
                     <Button 
                       size="sm" 
                       variant="outline" 
                       className="absolute top-2 right-2"
-                      onClick={() => copyToClipboard('curl https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link')}
+                      onClick={() => copyToClipboard('curl https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link \\\n  -H "Authorization: Bearer <your-token>"')}
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
@@ -203,6 +213,7 @@ def generate_feedback_link(ticket_data):
                     <pre className="bg-muted p-4 rounded-md text-sm overflow-auto">
 {`curl -X POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link \\
   -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer <your-token>" \\
   -d '{
     "ticket_number": "TEST-001"
   }'`}
@@ -213,6 +224,7 @@ def generate_feedback_link(ticket_data):
                       className="absolute top-2 right-2"
                       onClick={() => copyToClipboard(`curl -X POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link \\
   -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer <your-token>" \\
   -d '{
     "ticket_number": "TEST-001"
   }'`)}
@@ -287,6 +299,9 @@ def generate_feedback_link(ticket_data):
                   <Badge variant="outline" className="text-sm">
                     POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link
                   </Badge>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    <strong>Authentication:</strong> Bearer token required
+                  </p>
                 </div>
 
                 <div>
@@ -295,15 +310,17 @@ def generate_feedback_link(ticket_data):
                     <li><code>ticket_number</code> (string) - Unique ticket identifier</li>
                     <li><code>technician</code> (string) - Name of the technician</li>
                     <li><code>ticket_title</code> (string) - Brief description of the issue</li>
+                    <li><code>customer_email</code> (string) - Customer's email address</li>
+                    <li><code>customer_name</code> (string) - Customer's name</li>
+                    <li><code>expires_hours</code> (number) - Link expiration in hours</li>
                   </ul>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold mb-2">Optional Fields</h4>
+                  <h4 className="font-semibold mb-2">Headers</h4>
                   <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-                    <li><code>customer_email</code> (string) - Customer's email address</li>
-                    <li><code>customer_name</code> (string) - Customer's name</li>
-                    <li><code>expires_hours</code> (number) - Link expiration in hours (default: 72)</li>
+                    <li><code>Content-Type: application/json</code></li>
+                    <li><code>Authorization: Bearer &lt;your-token&gt;</code></li>
                   </ul>
                 </div>
 
@@ -318,6 +335,8 @@ def generate_feedback_link(ticket_data):
     "ticket_number": "TK-12345",
     "technician": "John Doe", 
     "ticket_title": "Computer won't start",
+    "customer_email": "customer@example.com",
+    "customer_name": "Jane Smith",
     "expires_in_hours": 48
   }
 }`}
@@ -325,12 +344,25 @@ def generate_feedback_link(ticket_data):
                 </div>
 
                 <div>
-                  <h4 className="font-semibold mb-2">Error Response (400)</h4>
-                  <pre className="bg-muted p-4 rounded-md text-sm overflow-auto">
+                  <h4 className="font-semibold mb-2">Error Responses</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <h5 className="font-medium text-sm">400 - Missing Required Fields</h5>
+                      <pre className="bg-muted p-4 rounded-md text-sm overflow-auto mt-2">
 {`{
-  "error": "Missing required fields: ticket_number, technician, ticket_title"
+  "error": "Missing required fields: ticket_number, technician, ticket_title, customer_email, customer_name, expires_hours"
 }`}
-                  </pre>
+                      </pre>
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-sm">401 - Unauthorized</h5>
+                      <pre className="bg-muted p-4 rounded-md text-sm overflow-auto mt-2">
+{`{
+  "error": "Missing or invalid authorization token"
+}`}
+                      </pre>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
