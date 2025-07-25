@@ -29,15 +29,17 @@ export const RoleBasedAccess: React.FC<RoleBasedAccessProps> = ({
           .from('profiles')
           .select('role')
           .eq('id', user.id)
-          .single();
+          .maybeSingle(); // Use maybeSingle instead of single to handle missing profiles
 
         if (error) {
           console.error('Error fetching user role:', error);
+          setUserRole('user'); // Default to 'user' role on error
         } else {
-          setUserRole(data?.role || 'user');
+          setUserRole(data?.role || 'user'); // Default to 'user' if no profile found
         }
       } catch (error) {
         console.error('Error fetching user role:', error);
+        setUserRole('user'); // Default to 'user' role on error
       } finally {
         setLoading(false);
       }
