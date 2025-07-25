@@ -257,6 +257,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      is_ip_whitelisted: {
+        Args: { user_ip: unknown }
+        Returns: boolean
+      }
       verify_totp_token: {
         Args: { user_id: string; token: string }
         Returns: boolean
