@@ -162,7 +162,6 @@ const Feedback: React.FC = () => {
             ticketNumber={feedbackLink?.ticket_number}
             technician={feedbackLink?.technician}
             ticketTitle={feedbackLink?.ticket_title}
-            defaultFeedbackType={feedbackLink?.default_feedback_type as FeedbackType}
             onSubmit={handleFeedbackSubmit}
           />
         </div>

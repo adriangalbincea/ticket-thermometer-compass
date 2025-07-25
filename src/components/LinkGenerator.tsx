@@ -17,7 +17,6 @@ interface GeneratedLink {
   customerEmail?: string;
   customerName?: string;
   expiresAt: string;
-  defaultFeedback?: string;
 }
 
 export const LinkGenerator: React.FC = () => {
@@ -27,7 +26,6 @@ export const LinkGenerator: React.FC = () => {
   const [customerEmail, setCustomerEmail] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [expiresHours, setExpiresHours] = useState('168');
-  const [defaultFeedback, setDefaultFeedback] = useState('');
   const [generatedLinks, setGeneratedLinks] = useState<GeneratedLink[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -44,8 +42,7 @@ export const LinkGenerator: React.FC = () => {
         p_ticket_title: ticketTitle,
         p_customer_email: customerEmail || null,
         p_customer_name: customerName || null,
-        p_expires_hours: parseInt(expiresHours),
-        p_default_feedback_type: defaultFeedback || null
+        p_expires_hours: parseInt(expiresHours)
       });
 
       if (error) {
@@ -68,8 +65,7 @@ export const LinkGenerator: React.FC = () => {
         ticketTitle,
         customerEmail: customerEmail || undefined,
         customerName: customerName || undefined,
-        expiresAt: expiryDate.toISOString(),
-        defaultFeedback: defaultFeedback || undefined
+        expiresAt: expiryDate.toISOString()
       };
 
       setGeneratedLinks(prev => [newLink, ...prev]);
@@ -85,7 +81,6 @@ export const LinkGenerator: React.FC = () => {
       setTicketTitle('');
       setCustomerEmail('');
       setCustomerName('');
-      setDefaultFeedback('');
       
     } catch (err) {
       toast({
@@ -198,21 +193,6 @@ export const LinkGenerator: React.FC = () => {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="default-feedback">Pre-select Feedback (Optional)</Label>
-              <select
-                id="default-feedback"
-                value={defaultFeedback}
-                onChange={(e) => setDefaultFeedback(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="">No pre-selection</option>
-                <option value="happy">😊 Happy</option>
-                <option value="neutral">😐 Neutral</option>
-                <option value="bad">😞 Bad</option>
-              </select>
-            </div>
-
             <Button 
               type="submit" 
               className="w-full bg-gradient-primary" 
@@ -243,12 +223,6 @@ export const LinkGenerator: React.FC = () => {
                       {link.customerName && (
                         <p className="text-sm text-muted-foreground">
                           Customer: {link.customerName}
-                        </p>
-                      )}
-                      {link.defaultFeedback && (
-                        <p className="text-sm text-muted-foreground">
-                          Pre-selected: {link.defaultFeedback === 'happy' ? '😊 Happy' : 
-                                       link.defaultFeedback === 'neutral' ? '😐 Neutral' : '😞 Bad'}
                         </p>
                       )}
                       <p className="text-xs text-muted-foreground">
