@@ -139,52 +139,13 @@ def generate_feedback_link(ticket_data):
           </p>
         </div>
 
-        <Tabs defaultValue="quick-test" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="quick-test">Quick Test</TabsTrigger>
+        <Tabs defaultValue="curl" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="curl">cURL Examples</TabsTrigger>
             <TabsTrigger value="code">Code Examples</TabsTrigger>
             <TabsTrigger value="reference">API Reference</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="quick-test" className="space-y-6">
-            <Card className="shadow-elegant">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Terminal className="h-5 w-5" />
-                  Quick API Test
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground">
-                  Test the API endpoint directly from this interface to verify it's working correctly.
-                </p>
-                
-                <div className="flex gap-4">
-                  <Button 
-                    onClick={testApiEndpoint} 
-                    disabled={testLoading}
-                    className="bg-gradient-primary"
-                  >
-                    {testLoading ? 'Testing...' : 'Test API Endpoint'}
-                  </Button>
-                  
-                  <Badge variant="outline" className="text-sm">
-                    POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link
-                  </Badge>
-                </div>
-
-                {testResult && (
-                  <div className="mt-4">
-                    <h4 className="font-semibold mb-2">Response:</h4>
-                    <pre className="bg-muted p-4 rounded-md text-sm overflow-auto">
-                      {testResult}
-                    </pre>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
 
           <TabsContent value="curl" className="space-y-6">
             <Card className="shadow-elegant">

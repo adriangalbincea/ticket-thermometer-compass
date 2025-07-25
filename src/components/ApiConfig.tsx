@@ -42,6 +42,7 @@ export const ApiConfig: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-supabase-anon-key'}`,
         },
         body: JSON.stringify(testPayload),
       });
