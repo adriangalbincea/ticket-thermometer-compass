@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BarChart3, MessageSquare, Settings, Home, LogOut, LogIn, User } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { supabase } from '@/integrations/supabase/client';
 
 export const Navigation: React.FC = () => {
@@ -126,13 +126,32 @@ export const Navigation: React.FC = () => {
           <div className="flex items-center gap-2 mt-2 sm:mt-0">
             {user ? (
               <>
-                <span className="text-sm text-muted-foreground hidden sm:inline">
-                  {user.email}
-                </span>
-                <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      <span className="text-sm text-muted-foreground hidden sm:inline">
+                        {user.email}
+                      </span>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <NavLink to="/profile" className="flex items-center">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </NavLink>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleSignOut}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Sign Out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
               <Button variant="outline" size="sm" asChild>
