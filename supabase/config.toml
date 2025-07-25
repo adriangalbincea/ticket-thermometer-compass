@@ -53,6 +53,3 @@ verify_jwt = false
 
 [functions.create-user]
 verify_jwt = true
-
-[functions.generate-emoji]
-verify_jwt = false
