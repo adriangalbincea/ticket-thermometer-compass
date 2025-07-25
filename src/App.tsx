@@ -45,7 +45,7 @@ const AppRoutes = () => {
       <Route path="/monitoring" element={
         <ProtectedRoute>
           <TwoFactorGuard>
-            <RoleBasedRoute allowedRoles={['admin', 'monitoring']}>
+            <RoleBasedRoute allowedRoles={['admin', 'user', 'monitoring']}>
               <MonitoringBoard />
             </RoleBasedRoute>
           </TwoFactorGuard>
@@ -55,7 +55,7 @@ const AppRoutes = () => {
       <Route path="/generate-links" element={
         <ProtectedRoute>
           <TwoFactorGuard>
-            <RoleBasedRoute allowedRoles={['admin']}>
+            <RoleBasedRoute allowedRoles={['admin', 'user']}>
               <GenerateLinks />
             </RoleBasedRoute>
           </TwoFactorGuard>
