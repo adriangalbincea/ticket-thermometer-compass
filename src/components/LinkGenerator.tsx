@@ -189,6 +189,7 @@ export const LinkGenerator: React.FC = () => {
                 min="1"
                 max="168"
                 placeholder="168"
+                required
               />
             </div>
 
