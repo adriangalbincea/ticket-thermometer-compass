@@ -40,7 +40,7 @@ export const TwoFactorManagement: React.FC = () => {
         .from('user_2fa')
         .select('is_enabled, backup_codes')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
         throw error;

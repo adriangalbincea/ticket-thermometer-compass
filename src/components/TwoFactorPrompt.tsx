@@ -31,7 +31,7 @@ export const TwoFactorPrompt: React.FC<TwoFactorPromptProps> = ({ onSuccess, onC
           .from('user_2fa')
           .select('is_enabled')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         setNeedsSetup(!userTwoFA?.is_enabled);
       } catch (error) {

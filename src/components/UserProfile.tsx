@@ -34,7 +34,7 @@ export const UserProfile: React.FC = () => {
           .from('profiles')
           .select('full_name, role')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error('Error fetching user profile:', error);

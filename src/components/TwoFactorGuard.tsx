@@ -61,7 +61,7 @@ export const TwoFactorGuard: React.FC<TwoFactorGuardProps> = ({ children }) => {
                 .from('user_2fa')
                 .select('is_enabled')
                 .eq('user_id', user.id)
-                .single();
+                .maybeSingle();
 
               console.log('TwoFactorGuard: User 2FA data:', userTwoFA);
 

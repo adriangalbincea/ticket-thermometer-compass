@@ -33,7 +33,7 @@ const Feedback: React.FC = () => {
           .eq('token', token)
           .eq('is_used', false)
           .gt('expires_at', new Date().toISOString())
-          .single();
+          .maybeSingle();
 
         if (error || !data) {
           setError('This feedback link has expired or has already been used');
