@@ -327,10 +327,10 @@ export const EmailConfig: React.FC = () => {
               onChange={(e) => setSettings(prev => ({ ...prev, notificationTemplate: e.target.value }))}
             />
             <p className="text-xs text-muted-foreground">
-              Available variables: {"{ticket_number}"}, {"{ticket_title}"}, {"{customer_name}"}, {"{customer_email}"}, {"{technician}"}, {"{feedback_type}"}, {"{comment}"}
+              Available variables: {"{ticket_number}"}, {"{ticket_title}"}, {"{customer_name}"}, {"{customer_email}"}, {"{technician}"}, {"{feedback_type}"}, {"{feedback_type_emoji}"}, {"{comment}"}
             </p>
             <p className="text-xs text-muted-foreground">
-              Feedback types include smiley faces: 😊 (happy), 😐 (neutral), 😞 (sad)
+              Use {"{feedback_type}"} for text (happy, neutral, sad) and {"{feedback_type_emoji}"} for emojis (😊, 😐, 😞)
             </p>
           </div>
 
