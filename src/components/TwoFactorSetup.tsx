@@ -39,7 +39,7 @@ export const TwoFactorSetup: React.FC<TwoFactorSetupProps> = ({ onComplete, onCa
       
       // Create TOTP URI
       const totp = new OTPAuth.TOTP({
-        issuer: 'WiseServe Feedback',
+        issuer: 'Wiseserve Feedback',
         label: user.email || 'Admin User',
         algorithm: 'SHA1',
         digits: 6,

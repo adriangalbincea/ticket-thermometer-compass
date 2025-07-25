@@ -138,7 +138,7 @@ export const EmailConfig: React.FC = () => {
       const { data, error } = await supabase.functions.invoke('send-test-email', {
         body: {
           to: testEmail,
-          subject: 'Test Email from WiseServe',
+          subject: 'Test Email from Wiseserve',
           htmlContent: '<h1>Test Email</h1><p>This is a test email to verify your Mailchimp configuration.</p><p>If you received this email, your email settings are working correctly!</p>',
           fromEmail: settings.fromEmail,
         },

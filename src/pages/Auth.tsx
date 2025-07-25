@@ -77,11 +77,11 @@ const Auth: React.FC = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center py-8 px-4">
       <div className="w-full max-w-md">
-        {/* WiseServe Logo */}
+        {/* Wiseserve Logo */}
         <div className="text-center mb-8">
           <img 
             src="/lovable-uploads/00a9f4fc-8ab5-4dd4-85ff-7abd95d3761e.png" 
-            alt="WiseServe Logo" 
+            alt="Wiseserve Logo" 
             className="h-24 mx-auto mb-4"
           />
         </div>

@@ -135,7 +135,7 @@ def generate_feedback_link(ticket_data):
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-foreground mb-4">API Testing Guide</h1>
           <p className="text-lg text-muted-foreground">
-            Comprehensive guide to test the WiseServe Feedback API
+            Comprehensive guide to test the Wiseserve Feedback API
           </p>
         </div>
 

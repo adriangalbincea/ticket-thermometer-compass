@@ -147,7 +147,7 @@ const handler = async (req: Request): Promise<Response> => {
             html: finalHtmlContent,
             subject: finalSubject,
             from_email: fromEmail,
-            from_name: "WiseServe",
+            from_name: "Wiseserve",
             to: [
               {
                 email: recipient.email,

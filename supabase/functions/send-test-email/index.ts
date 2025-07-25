@@ -57,7 +57,7 @@ const handler = async (req: Request): Promise<Response> => {
         html: htmlContent,
         subject: subject,
         from_email: fromEmail || "feedback@wiseserve.net",
-        from_name: "WiseServe",
+        from_name: "Wiseserve",
         to: [
           {
             email: to,

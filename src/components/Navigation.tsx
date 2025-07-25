@@ -85,10 +85,10 @@ export const Navigation: React.FC = () => {
       <CardContent className="p-4">
         <nav className="flex flex-wrap justify-between items-center">
           <div className="flex items-center gap-4">
-            {/* WiseServe Logo */}
+            {/* Wiseserve Logo */}
             <img 
               src="/lovable-uploads/a731101c-1c01-4a4d-b918-86bf17193d27.png" 
-              alt="WiseServe" 
+              alt="Wiseserve" 
               className="h-8 w-8"
             />
             
