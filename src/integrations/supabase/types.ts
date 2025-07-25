@@ -70,6 +70,7 @@ export type Database = {
           created_at: string
           customer_email: string | null
           customer_name: string | null
+          default_feedback_type: string | null
           expires_at: string
           id: string
           is_used: boolean
@@ -84,6 +85,7 @@ export type Database = {
           created_at?: string
           customer_email?: string | null
           customer_name?: string | null
+          default_feedback_type?: string | null
           expires_at: string
           id?: string
           is_used?: boolean
@@ -98,6 +100,7 @@ export type Database = {
           created_at?: string
           customer_email?: string | null
           customer_name?: string | null
+          default_feedback_type?: string | null
           expires_at?: string
           id?: string
           is_used?: boolean
@@ -235,14 +238,24 @@ export type Database = {
     }
     Functions: {
       create_feedback_link: {
-        Args: {
-          p_ticket_number: string
-          p_technician: string
-          p_ticket_title: string
-          p_customer_email?: string
-          p_customer_name?: string
-          p_expires_hours?: number
-        }
+        Args:
+          | {
+              p_ticket_number: string
+              p_technician: string
+              p_ticket_title: string
+              p_customer_email?: string
+              p_customer_name?: string
+              p_expires_hours?: number
+            }
+          | {
+              p_ticket_number: string
+              p_technician: string
+              p_ticket_title: string
+              p_customer_email?: string
+              p_customer_name?: string
+              p_expires_hours?: number
+              p_default_feedback_type?: string
+            }
         Returns: string
       }
       get_current_user_role: {
