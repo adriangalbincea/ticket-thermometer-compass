@@ -48,24 +48,9 @@ export const TwoFactorGuard: React.FC<TwoFactorGuardProps> = ({ children }) => {
         
         // Only check 2FA for admin users
         if (userProfile?.role === 'admin') {
-          // Get client IP for IP whitelist check
-          let clientIp = null;
-          try {
-            const { data: ipData } = await supabase.functions.invoke('get-client-ip');
-            clientIp = ipData?.ip;
-            console.log('TwoFactorGuard: Client IP:', clientIp);
-          } catch (error) {
-            console.log('TwoFactorGuard: Could not get client IP:', error);
-          }
-
-          // Check if 2FA is required for this user with IP consideration
-          const { data: requires2FA } = await supabase
-            .rpc('is_2fa_required_with_ip', { 
-              user_id: user.id,
-              user_ip: clientIp 
-            });
-          
-          console.log('TwoFactorGuard: 2FA required (with IP check):', requires2FA);
+          // Check if 2FA is required for this user
+          const requires2FA = await check2FARequirement();
+          console.log('TwoFactorGuard: 2FA required:', requires2FA);
           
           if (requires2FA) {
             console.log('TwoFactorGuard: Session 2FA status:', isSessionVerified);
