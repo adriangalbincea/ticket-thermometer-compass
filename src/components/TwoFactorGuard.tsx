@@ -37,30 +37,44 @@ export const TwoFactorGuard: React.FC<TwoFactorGuardProps> = ({ children }) => {
       try {
         console.log('TwoFactorGuard: Checking 2FA requirement for user:', user.email);
         
-        // Check if 2FA is required for this user
-        const requires2FA = await check2FARequirement();
-        console.log('TwoFactorGuard: 2FA required:', requires2FA);
+        // Get user role first to determine if 2FA check is needed
+        const { data: userProfile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
         
-        if (requires2FA) {
-          console.log('TwoFactorGuard: Session 2FA status:', isSessionVerified);
+        console.log('TwoFactorGuard: User role:', userProfile?.role);
+        
+        // Only check 2FA for admin users
+        if (userProfile?.role === 'admin') {
+          // Check if 2FA is required for this user
+          const requires2FA = await check2FARequirement();
+          console.log('TwoFactorGuard: 2FA required:', requires2FA);
           
-          if (!isSessionVerified) {
-            // Check if user has 2FA enabled
-            const { data: userTwoFA } = await supabase
-              .from('user_2fa')
-              .select('is_enabled')
-              .eq('user_id', user.id)
-              .single();
+          if (requires2FA) {
+            console.log('TwoFactorGuard: Session 2FA status:', isSessionVerified);
+            
+            if (!isSessionVerified) {
+              // Check if user has 2FA enabled
+              const { data: userTwoFA } = await supabase
+                .from('user_2fa')
+                .select('is_enabled')
+                .eq('user_id', user.id)
+                .single();
 
-            console.log('TwoFactorGuard: User 2FA data:', userTwoFA);
+              console.log('TwoFactorGuard: User 2FA data:', userTwoFA);
 
-            // If 2FA is required, user must either have it enabled or needs to set it up
-            console.log('TwoFactorGuard: Showing 2FA prompt/setup');
-            setNeedsTwoFA(true);
-            setLoading(false);
-            setHasChecked(true);
-            return;
+              // If 2FA is required, user must either have it enabled or needs to set it up
+              console.log('TwoFactorGuard: Showing 2FA prompt/setup');
+              setNeedsTwoFA(true);
+              setLoading(false);
+              setHasChecked(true);
+              return;
+            }
           }
+        } else {
+          console.log('TwoFactorGuard: User is not admin, skipping 2FA check');
         }
         
         console.log('TwoFactorGuard: No 2FA needed, showing content');

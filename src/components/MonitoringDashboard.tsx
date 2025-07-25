@@ -249,57 +249,6 @@ export const MonitoringDashboard: React.FC = () => {
         </Card>
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="shadow-elegant">
-          <CardHeader>
-            <CardTitle>Technician Performance (Top 10)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="name" 
-                  angle={-45}
-                  textAnchor="end"
-                  height={100}
-                  fontSize={12}
-                />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="happy" stackId="a" fill="#22c55e" name="Happy" />
-                <Bar dataKey="neutral" stackId="a" fill="#f59e0b" name="Neutral" />
-                <Bar dataKey="unhappy" stackId="a" fill="#ef4444" name="Unhappy" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-elegant">
-          <CardHeader>
-            <CardTitle>Satisfaction Rate Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="name" 
-                  angle={-45}
-                  textAnchor="end"
-                  height={100}
-                  fontSize={12}
-                />
-                <YAxis />
-                <Tooltip formatter={(value) => [`${value}%`, 'Satisfaction Rate']} />
-                <Bar dataKey="satisfaction" fill="#3b82f6" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Filters and Technician List */}
       <Card className="shadow-elegant">

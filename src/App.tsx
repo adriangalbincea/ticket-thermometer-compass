@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { RoleBasedAccess } from "@/components/RoleBasedAccess";
 import { TwoFactorGuard } from "@/components/TwoFactorGuard";
+import { RoleBasedRoute } from "@/components/RoleBasedRoute";
 import Profile from "./pages/Profile";
 import GenerateLinks from "./pages/GenerateLinks";
 import Feedback from "./pages/Feedback";
@@ -43,32 +44,48 @@ const AppRoutes = () => {
       } />
       <Route path="/monitoring" element={
         <ProtectedRoute>
-          <MonitoringBoard />
+          <TwoFactorGuard>
+            <RoleBasedRoute allowedRoles={['admin', 'monitoring']}>
+              <MonitoringBoard />
+            </RoleBasedRoute>
+          </TwoFactorGuard>
         </ProtectedRoute>
       } />
       <Route path="/feedback/:token" element={<Feedback />} />
       <Route path="/generate-links" element={
         <ProtectedRoute>
-          <GenerateLinks />
+          <TwoFactorGuard>
+            <RoleBasedRoute allowedRoles={['admin']}>
+              <GenerateLinks />
+            </RoleBasedRoute>
+          </TwoFactorGuard>
         </ProtectedRoute>
       } />
       <Route path="/profile" element={
         <ProtectedRoute>
-          <Profile />
+          <TwoFactorGuard>
+            <RoleBasedRoute allowedRoles={['admin', 'user', 'monitoring']}>
+              <Profile />
+            </RoleBasedRoute>
+          </TwoFactorGuard>
         </ProtectedRoute>
       } />
       <Route path="/config" element={
         <ProtectedRoute>
-          <RoleBasedAccess allowedRoles={['admin']} fallback={<Navigate to="/admin" replace />}>
-            <Config />
-          </RoleBasedAccess>
+          <TwoFactorGuard>
+            <RoleBasedRoute allowedRoles={['admin']}>
+              <Config />
+            </RoleBasedRoute>
+          </TwoFactorGuard>
         </ProtectedRoute>
       } />
       <Route path="/api-test-guide" element={
         <ProtectedRoute>
-          <RoleBasedAccess allowedRoles={['admin']} fallback={<Navigate to="/admin" replace />}>
-            <ApiTestGuide />
-          </RoleBasedAccess>
+          <TwoFactorGuard>
+            <RoleBasedRoute allowedRoles={['admin']}>
+              <ApiTestGuide />
+            </RoleBasedRoute>
+          </TwoFactorGuard>
         </ProtectedRoute>
       } />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

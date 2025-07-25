@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Mail, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { NotificationRecipientsConfig } from './NotificationRecipientsConfig';
 
 interface EmailSettings {
   smtpHost: string;
@@ -69,7 +70,7 @@ export const EmailConfig: React.FC = () => {
         smtpHost: settingsMap.get('smtp_host') || '',
         smtpPort: settingsMap.get('smtp_port') || '587',
         smtpUsername: settingsMap.get('smtp_username') || '',
-        smtpPassword: settingsMap.get('smtp_password') || '',
+        smtpPassword: settingsMap.get('smtp_password') ? atob(settingsMap.get('smtp_password') || '') : '', // Base64 decode password
         useTLS: settingsMap.get('smtp_use_tls') === 'true',
         notificationSubject: settingsMap.get('template_notification_subject') || 'New Feedback Received - Ticket #{ticket_number}',
         notificationTemplate: settingsMap.get('template_notification_html') || '<h1>New Feedback</h1><p>A new feedback has been submitted for ticket {ticket_number} by {customer_name}...</p>',
@@ -98,7 +99,7 @@ export const EmailConfig: React.FC = () => {
           { setting_type: 'smtp', setting_key: 'host', setting_value: settings.smtpHost },
           { setting_type: 'smtp', setting_key: 'port', setting_value: settings.smtpPort },
           { setting_type: 'smtp', setting_key: 'username', setting_value: settings.smtpUsername },
-          { setting_type: 'smtp', setting_key: 'password', setting_value: settings.smtpPassword },
+          { setting_type: 'smtp', setting_key: 'password', setting_value: btoa(settings.smtpPassword) }, // Base64 encode password
           { setting_type: 'smtp', setting_key: 'use_tls', setting_value: settings.useTLS.toString() }
         );
       } else {
@@ -350,6 +351,9 @@ export const EmailConfig: React.FC = () => {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Notification Recipients */}
+      <NotificationRecipientsConfig />
     </div>
   );
 };

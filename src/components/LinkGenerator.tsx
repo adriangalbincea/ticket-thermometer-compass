@@ -25,7 +25,7 @@ export const LinkGenerator: React.FC = () => {
   const [ticketTitle, setTicketTitle] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
   const [customerName, setCustomerName] = useState('');
-  const [expiresHours, setExpiresHours] = useState('72');
+  const [expiresHours, setExpiresHours] = useState('168');
   const [generatedLinks, setGeneratedLinks] = useState<GeneratedLink[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -156,23 +156,25 @@ export const LinkGenerator: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="customer-name">Customer Name (Optional)</Label>
+                <Label htmlFor="customer-name">Customer Name*</Label>
                 <Input
                   id="customer-name"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   placeholder="Alice Johnson"
+                  required
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="customer-email">Customer Email (Optional)</Label>
+                <Label htmlFor="customer-email">Customer Email*</Label>
                 <Input
                   id="customer-email"
                   type="email"
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
                   placeholder="alice@company.com"
+                  required
                 />
               </div>
             </div>
@@ -186,7 +188,7 @@ export const LinkGenerator: React.FC = () => {
                 onChange={(e) => setExpiresHours(e.target.value)}
                 min="1"
                 max="168"
-                placeholder="72"
+                placeholder="168"
               />
             </div>
 

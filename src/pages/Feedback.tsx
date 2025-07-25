@@ -83,6 +83,20 @@ const Feedback: React.FC = () => {
         })
         .eq('id', feedbackLink.id);
 
+      // Send notification emails
+      try {
+        await supabase.functions.invoke('send-feedback-notification', {
+          body: {
+            feedbackLinkId: feedbackLink.id,
+            feedbackType: feedback.type,
+            comment: feedback.comment
+          }
+        });
+      } catch (notificationError) {
+        console.error('Failed to send notification emails:', notificationError);
+        // Don't show error to user as feedback was submitted successfully
+      }
+
       toast({
         title: "Thank you!",
         description: "Your feedback has been submitted successfully.",
