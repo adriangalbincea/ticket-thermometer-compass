@@ -184,7 +184,23 @@ const handler = async (req: Request): Promise<Response> => {
       .replace(/{customer_name}/g, feedbackLink.customer_name || 'N/A')
       .replace(/{customer_email}/g, feedbackLink.customer_email || 'N/A')
       .replace(/{feedback_type}/g, feedbackType)
-      .replace(/{comment}/g, comment || 'No comment provided');
+      .replace(/{comment}/g, comment || 'No comment provided')
+      .replace(/{feedback_type_emoji}/g, getFeedbackEmoji(feedbackType));
+
+    // Helper function to get emoji based on feedback type
+    function getFeedbackEmoji(type: string): string {
+      switch (type.toLowerCase()) {
+        case 'happy':
+          return '😊';
+        case 'neutral':
+          return '😐';
+        case 'sad':
+        case 'unhappy':
+          return '😞';
+        default:
+          return '📝';
+      }
+    }
 
     const fromEmail = settingsMap.get('api_from_email') || 'feedback@wiseserve.net';
 
