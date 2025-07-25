@@ -27,9 +27,10 @@ export const TwoFactorGuard: React.FC<TwoFactorGuardProps> = ({ children }) => {
       const sessionKey = `2fa_verified_${user.id}`;
       const isSessionVerified = sessionStorage.getItem(sessionKey) === 'true';
       
-      if (hasChecked && isSessionVerified) {
+      if (isSessionVerified) {
         setLoading(false);
         setNeedsTwoFA(false);
+        setHasChecked(true);
         return;
       }
 
@@ -73,12 +74,23 @@ export const TwoFactorGuard: React.FC<TwoFactorGuardProps> = ({ children }) => {
       }
     };
 
-    // Only run the check if we haven't checked yet or if the user changed
-    if (!hasChecked || !sessionStorage.getItem(`2fa_verified_${user?.id}`)) {
-      checkTwoFARequirement();
-    } else {
+    // Check session storage first for immediate response
+    const sessionKey = `2fa_verified_${user?.id}`;
+    const isSessionVerified = sessionStorage.getItem(sessionKey) === 'true';
+    
+    if (user && isSessionVerified) {
       setLoading(false);
       setNeedsTwoFA(false);
+      setHasChecked(true);
+      return;
+    }
+
+    // Only run the full check if we haven't verified in session
+    if (user && !isSessionVerified) {
+      checkTwoFARequirement();
+    } else if (!user) {
+      setLoading(false);
+      setHasChecked(false);
     }
   }, [user, check2FARequirement]);
 
