@@ -25,6 +25,9 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { to, subject, htmlContent, fromEmail }: TestEmailRequest = await req.json();
 
+    console.log("Attempting to send email with:", { to, subject, fromEmail });
+    console.log("RESEND_API_KEY exists:", !!Deno.env.get("RESEND_API_KEY"));
+
     const emailResponse = await resend.emails.send({
       from: fromEmail || "Test <onboarding@resend.dev>",
       to: [to],
