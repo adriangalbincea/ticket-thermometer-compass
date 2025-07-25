@@ -107,16 +107,16 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
         {/* Feedback Buttons */}
         <div className="grid grid-cols-3 gap-6 mb-6">
           <Button
-            variant={selectedFeedback === 'bad' ? 'default' : 'outline'}
+            variant={selectedFeedback === 'happy' ? 'default' : 'outline'}
             className={`h-32 flex-col gap-3 transition-all duration-200 hover:scale-105 ${
-              selectedFeedback === 'bad' 
-                ? 'bg-feedback-bad text-feedback-bad-foreground hover:bg-feedback-bad/90 shadow-lg' 
-                : 'hover:bg-feedback-bad/10 hover:border-feedback-bad bg-feedback-bad/5'
+              selectedFeedback === 'happy' 
+                ? 'bg-feedback-happy text-feedback-happy-foreground hover:bg-feedback-happy/90 shadow-lg' 
+                : 'hover:bg-feedback-happy/10 hover:border-feedback-happy bg-feedback-happy/5'
             }`}
-            onClick={() => handleFeedbackSelect('bad')}
+            onClick={() => handleFeedbackSelect('happy')}
           >
-            <div className="text-4xl">😞</div>
-            <span className="font-medium text-lg">Bad</span>
+            <div className="text-4xl">😊</div>
+            <span className="font-medium text-lg">Happy</span>
           </Button>
 
           <Button
@@ -133,16 +133,16 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
           </Button>
 
           <Button
-            variant={selectedFeedback === 'happy' ? 'default' : 'outline'}
+            variant={selectedFeedback === 'bad' ? 'default' : 'outline'}
             className={`h-32 flex-col gap-3 transition-all duration-200 hover:scale-105 ${
-              selectedFeedback === 'happy' 
-                ? 'bg-feedback-happy text-feedback-happy-foreground hover:bg-feedback-happy/90 shadow-lg' 
-                : 'hover:bg-feedback-happy/10 hover:border-feedback-happy bg-feedback-happy/5'
+              selectedFeedback === 'bad' 
+                ? 'bg-feedback-bad text-feedback-bad-foreground hover:bg-feedback-bad/90 shadow-lg' 
+                : 'hover:bg-feedback-bad/10 hover:border-feedback-bad bg-feedback-bad/5'
             }`}
-            onClick={() => handleFeedbackSelect('happy')}
+            onClick={() => handleFeedbackSelect('bad')}
           >
-            <div className="text-4xl">😊</div>
-            <span className="font-medium text-lg">Happy</span>
+            <div className="text-4xl">😞</div>
+            <span className="font-medium text-lg">Bad</span>
           </Button>
         </div>
 
