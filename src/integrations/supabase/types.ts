@@ -237,6 +237,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_feedback_links: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       create_feedback_link: {
         Args: {
           p_ticket_number: string
