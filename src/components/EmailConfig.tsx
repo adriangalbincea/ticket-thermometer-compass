@@ -8,7 +8,6 @@ import { Mail, Send, Key } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { NotificationRecipientsConfig } from './NotificationRecipientsConfig';
-import { EmailTemplateDesigner } from './EmailTemplateDesigner';
 
 interface EmailSettings {
   fromEmail: string;
@@ -319,13 +318,19 @@ export const EmailConfig: React.FC = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notification-template">Notification Email Template</Label>
-            <EmailTemplateDesigner
-              template={settings.notificationTemplate}
-              onChange={(template) => setSettings(prev => ({ ...prev, notificationTemplate: template }))}
+            <Label htmlFor="notification-template">Notification Email Template (HTML)</Label>
+            <Textarea
+              id="notification-template"
+              placeholder="Enter your HTML template here..."
+              className="min-h-[200px] font-mono text-sm"
+              value={settings.notificationTemplate}
+              onChange={(e) => setSettings(prev => ({ ...prev, notificationTemplate: e.target.value }))}
             />
             <p className="text-xs text-muted-foreground">
               Available variables: {"{ticket_number}"}, {"{ticket_title}"}, {"{customer_name}"}, {"{customer_email}"}, {"{technician}"}, {"{feedback_type}"}, {"{comment}"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Feedback types include smiley faces: 😊 (happy), 😐 (neutral), 😞 (sad)
             </p>
           </div>
 
