@@ -28,6 +28,7 @@ export const ApiConfig: React.FC = () => {
     customer_name: 'Test Customer',
     expires_hours: 72
   });
+  const [bearerToken, setBearerToken] = useState<string>('');
   const [apiResponse, setApiResponse] = useState<string>('');
   const [loading, setLoading] = useState(false);
   
@@ -38,12 +39,17 @@ export const ApiConfig: React.FC = () => {
   const testApi = async () => {
     setLoading(true);
     try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (bearerToken.trim()) {
+        headers['Authorization'] = `Bearer ${bearerToken.trim()}`;
+      }
+      
       const response = await fetch(API_ENDPOINT, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-supabase-anon-key'}`,
-        },
+        headers,
         body: JSON.stringify(testPayload),
       });
       
@@ -166,6 +172,20 @@ export const ApiConfig: React.FC = () => {
               value={testPayload.expires_hours || 72}
               onChange={(e) => setTestPayload({ ...testPayload, expires_hours: parseInt(e.target.value) })}
             />
+          </div>
+          
+          <div>
+            <Label htmlFor="bearer_token">Bearer Token (Optional)</Label>
+            <Input
+              id="bearer_token"
+              type="password"
+              placeholder="Enter Bearer token for authentication"
+              value={bearerToken}
+              onChange={(e) => setBearerToken(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Leave empty if no authentication is required
+            </p>
           </div>
 
           <Button onClick={testApi} disabled={loading} className="w-full">
