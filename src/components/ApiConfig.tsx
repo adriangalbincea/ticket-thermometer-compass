@@ -41,11 +41,8 @@ export const ApiConfig: React.FC = () => {
     try {
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${bearerToken.trim()}`,
       };
-      
-      if (bearerToken.trim()) {
-        headers['Authorization'] = `Bearer ${bearerToken.trim()}`;
-      }
       
       const response = await fetch(API_ENDPOINT, {
         method: 'POST',
@@ -124,6 +121,7 @@ export const ApiConfig: React.FC = () => {
                 id="ticket_number"
                 value={testPayload.ticket_number}
                 onChange={(e) => setTestPayload({ ...testPayload, ticket_number: e.target.value })}
+                required
               />
             </div>
             <div>
@@ -132,6 +130,7 @@ export const ApiConfig: React.FC = () => {
                 id="technician"
                 value={testPayload.technician}
                 onChange={(e) => setTestPayload({ ...testPayload, technician: e.target.value })}
+                required
               />
             </div>
           </div>
@@ -142,24 +141,27 @@ export const ApiConfig: React.FC = () => {
               id="ticket_title"
               value={testPayload.ticket_title}
               onChange={(e) => setTestPayload({ ...testPayload, ticket_title: e.target.value })}
+              required
             />
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="customer_email">Customer Email (Optional)</Label>
+              <Label htmlFor="customer_email">Customer Email</Label>
               <Input
                 id="customer_email"
                 value={testPayload.customer_email || ''}
                 onChange={(e) => setTestPayload({ ...testPayload, customer_email: e.target.value })}
+                required
               />
             </div>
             <div>
-              <Label htmlFor="customer_name">Customer Name (Optional)</Label>
+              <Label htmlFor="customer_name">Customer Name</Label>
               <Input
                 id="customer_name"
                 value={testPayload.customer_name || ''}
                 onChange={(e) => setTestPayload({ ...testPayload, customer_name: e.target.value })}
+                required
               />
             </div>
           </div>
@@ -171,21 +173,20 @@ export const ApiConfig: React.FC = () => {
               type="number"
               value={testPayload.expires_hours || 72}
               onChange={(e) => setTestPayload({ ...testPayload, expires_hours: parseInt(e.target.value) })}
+              required
             />
           </div>
           
           <div>
-            <Label htmlFor="bearer_token">Bearer Token (Optional)</Label>
+            <Label htmlFor="bearer_token">Bearer Token</Label>
             <Input
               id="bearer_token"
               type="password"
               placeholder="Enter Bearer token for authentication"
               value={bearerToken}
               onChange={(e) => setBearerToken(e.target.value)}
+              required
             />
-            <p className="text-xs text-muted-foreground mt-1">
-              Leave empty if no authentication is required
-            </p>
           </div>
 
           <Button onClick={testApi} disabled={loading} className="w-full">

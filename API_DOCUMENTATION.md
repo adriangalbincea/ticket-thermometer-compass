@@ -9,13 +9,14 @@ POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-lin
 ```
 
 ## Authentication
-This endpoint is public - no authentication required.
+This endpoint requires Bearer token authentication.
 
 ## Request Format
 
 ### Headers
 ```
 Content-Type: application/json
+Authorization: Bearer <your-token>
 ```
 
 ### Request Body
@@ -24,9 +25,9 @@ Content-Type: application/json
   "ticket_number": "string (required)",
   "technician": "string (required)", 
   "ticket_title": "string (required)",
-  "customer_email": "string (optional)",
-  "customer_name": "string (optional)",
-  "expires_hours": "number (optional, default: 72)"
+  "customer_email": "string (required)",
+  "customer_name": "string (required)",
+  "expires_hours": "number (required)"
 }
 ```
 
@@ -34,6 +35,7 @@ Content-Type: application/json
 ```bash
 curl -X POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-token>" \
   -d '{
     "ticket_number": "TK-12345",
     "technician": "John Doe",
@@ -66,7 +68,14 @@ curl -X POST https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feed
 #### 400 - Missing Required Fields
 ```json
 {
-  "error": "Missing required fields: ticket_number, technician, ticket_title"
+  "error": "Missing required fields: ticket_number, technician, ticket_title, customer_email, customer_name, expires_hours"
+}
+```
+
+#### 401 - Unauthorized
+```json
+{
+  "error": "Missing or invalid authorization token"
 }
 ```
 
@@ -93,6 +102,7 @@ const generateFeedbackLink = async (ticketData) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.API_TOKEN}`,
     },
     body: JSON.stringify({
       ticket_number: ticketData.ticketNumber,
@@ -121,7 +131,7 @@ const generateFeedbackLink = async (ticketData) => {
 import requests
 import json
 
-def generate_feedback_link(ticket_data):
+def generate_feedback_link(ticket_data, api_token):
     url = "https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link"
     
     payload = {
@@ -133,7 +143,12 @@ def generate_feedback_link(ticket_data):
         "expires_hours": ticket_data.get("expires_hours", 72)
     }
     
-    response = requests.post(url, json=payload)
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {api_token}'
+    }
+    
+    response = requests.post(url, json=payload, headers=headers)
     result = response.json()
     
     if result.get("success"):
@@ -145,7 +160,7 @@ def generate_feedback_link(ticket_data):
 ### PHP
 ```php
 <?php
-function generateFeedbackLink($ticketData) {
+function generateFeedbackLink($ticketData, $apiToken) {
     $url = 'https://iaiennljjjvstovtpdhw.supabase.co/functions/v1/generate-feedback-link';
     
     $payload = array(
@@ -159,7 +174,10 @@ function generateFeedbackLink($ticketData) {
     
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        'Content-Type: application/json',
+        'Authorization: Bearer ' . $apiToken
+    ));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     
     $result = curl_exec($ch);
