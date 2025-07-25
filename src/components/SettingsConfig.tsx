@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Settings, Mail, Server, Shield } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Settings, Mail, Server, Shield, Plus, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -16,9 +17,10 @@ export const SettingsConfig: React.FC = () => {
     support_email: '',
     auto_archive: false,
     email_notifications: false,
-    session_timeout: '60',
+    session_timeout: '1',
     two_factor_auth: false,
-    ip_whitelist: false
+    ip_whitelist: false,
+    ip_whitelist_addresses: ''
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -47,9 +49,10 @@ export const SettingsConfig: React.FC = () => {
           support_email: settingsMap.support_email || '',
           auto_archive: settingsMap.auto_archive === 'true',
           email_notifications: settingsMap.email_notifications === 'true',
-          session_timeout: settingsMap.session_timeout || '60',
+          session_timeout: settingsMap.session_timeout || '1',
           two_factor_auth: settingsMap.two_factor_auth === 'true',
-          ip_whitelist: settingsMap.ip_whitelist === 'true'
+          ip_whitelist: settingsMap.ip_whitelist === 'true',
+          ip_whitelist_addresses: settingsMap.ip_whitelist_addresses || ''
         });
       }
     } catch (error: any) {
@@ -73,7 +76,8 @@ export const SettingsConfig: React.FC = () => {
         { setting_key: 'email_notifications', setting_value: settings.email_notifications.toString() },
         { setting_key: 'session_timeout', setting_value: settings.session_timeout },
         { setting_key: 'two_factor_auth', setting_value: settings.two_factor_auth.toString() },
-        { setting_key: 'ip_whitelist', setting_value: settings.ip_whitelist.toString() }
+        { setting_key: 'ip_whitelist', setting_value: settings.ip_whitelist.toString() },
+        { setting_key: 'ip_whitelist_addresses', setting_value: settings.ip_whitelist_addresses }
       ];
 
       for (const setting of settingsToSave) {
@@ -185,16 +189,17 @@ export const SettingsConfig: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="session-timeout">Session Timeout (minutes)</Label>
+            <Label htmlFor="session-timeout">Session Timeout (hours)</Label>
             <Select value={settings.session_timeout} onValueChange={(value) => setSettings(prev => ({ ...prev, session_timeout: value }))}>
               <SelectTrigger>
                 <SelectValue placeholder="Select timeout" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="30">30 minutes</SelectItem>
-                <SelectItem value="60">1 hour</SelectItem>
-                <SelectItem value="120">2 hours</SelectItem>
-                <SelectItem value="240">4 hours</SelectItem>
+              <SelectContent className="bg-background border border-border shadow-lg z-50">
+                <SelectItem value="0.5">30 minutes</SelectItem>
+                <SelectItem value="1">1 hour</SelectItem>
+                <SelectItem value="2">2 hours</SelectItem>
+                <SelectItem value="4">4 hours</SelectItem>
+                <SelectItem value="8">8 hours</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -213,17 +218,35 @@ export const SettingsConfig: React.FC = () => {
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>IP whitelist</Label>
-                <p className="text-sm text-muted-foreground">
-                  Restrict admin access to specific IP addresses
-                </p>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>IP Whitelist</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Restrict admin access to specific IP addresses
+                  </p>
+                </div>
+                <Switch 
+                  checked={settings.ip_whitelist}
+                  onCheckedChange={(checked) => setSettings(prev => ({ ...prev, ip_whitelist: checked }))}
+                />
               </div>
-              <Switch 
-                checked={settings.ip_whitelist}
-                onCheckedChange={(checked) => setSettings(prev => ({ ...prev, ip_whitelist: checked }))}
-              />
+
+              {settings.ip_whitelist && (
+                <div className="space-y-2">
+                  <Label htmlFor="ip-addresses">Allowed IP Addresses</Label>
+                  <Textarea
+                    id="ip-addresses"
+                    placeholder="192.168.1.100&#10;203.0.113.42&#10;2001:db8::1&#10;&#10;Enter one IP address per line. Supports IPv4 and IPv6 addresses."
+                    value={settings.ip_whitelist_addresses}
+                    onChange={(e) => setSettings(prev => ({ ...prev, ip_whitelist_addresses: e.target.value }))}
+                    className="min-h-[120px] font-mono text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Enter one IP address per line. Supports both IPv4 (e.g., 192.168.1.100) and IPv6 (e.g., 2001:db8::1) addresses.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
