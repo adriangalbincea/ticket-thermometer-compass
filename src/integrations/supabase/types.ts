@@ -253,6 +253,10 @@ export type Database = {
         Args: { user_id: string }
         Returns: boolean
       }
+      is_2fa_required_with_ip: {
+        Args: { user_id: string; user_ip?: string }
+        Returns: boolean
+      }
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean

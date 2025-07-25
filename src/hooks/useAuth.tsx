@@ -59,12 +59,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return false;
 
+      // Get client IP first
+      let clientIp = null;
+      try {
+        const { data: ipData } = await supabase.functions.invoke('get-client-ip');
+        clientIp = ipData?.ip;
+        console.log('Client IP for 2FA check:', clientIp);
+      } catch (error) {
+        console.log('Could not get client IP, proceeding without IP check:', error);
+      }
+
+      // Check 2FA requirement with IP
       const { data, error } = await supabase
-        .rpc('is_2fa_required', { user_id: user.id });
+        .rpc('is_2fa_required_with_ip', { 
+          user_id: user.id,
+          user_ip: clientIp 
+        });
 
       if (error) {
         console.error('Error checking 2FA requirement:', error);
-        return false;
+        // Fallback to original function without IP
+        const { data: fallbackData } = await supabase
+          .rpc('is_2fa_required', { user_id: user.id });
+        return fallbackData || false;
       }
 
       return data || false;

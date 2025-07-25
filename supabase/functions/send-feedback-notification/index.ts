@@ -98,21 +98,73 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Prepare email content
+    // Prepare email content with nicer templates
     const subject = settingsMap.get('template_notification_subject') || 'New Feedback Received - Ticket #{ticket_number}';
     const htmlTemplate = settingsMap.get('template_notification_html') || `
-      <h1>New Feedback Received</h1>
-      <p>A new feedback has been submitted for ticket <strong>{ticket_number}</strong>.</p>
-      <h3>Details:</h3>
-      <ul>
-        <li><strong>Ticket Number:</strong> {ticket_number}</li>
-        <li><strong>Ticket Title:</strong> {ticket_title}</li>
-        <li><strong>Technician:</strong> {technician}</li>
-        <li><strong>Customer Name:</strong> {customer_name}</li>
-        <li><strong>Customer Email:</strong> {customer_email}</li>
-        <li><strong>Feedback Type:</strong> {feedback_type}</li>
-        <li><strong>Comment:</strong> {comment}</li>
-      </ul>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>New Feedback Received</title>
+        <style>
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background-color: #f4f6f9; margin: 0; padding: 20px; }
+          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+          .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+          .header h1 { margin: 0; font-size: 28px; font-weight: 600; }
+          .content { padding: 30px; }
+          .feedback-type { display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; margin-bottom: 20px; }
+          .feedback-happy { background: #d4edda; color: #155724; }
+          .feedback-neutral { background: #fff3cd; color: #856404; }
+          .feedback-sad { background: #f8d7da; color: #721c24; }
+          .details-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; margin: 20px 0; }
+          .detail-label { font-weight: 600; color: #666; }
+          .detail-value { color: #333; }
+          .comment-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+          .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 14px; color: #666; }
+          .logo { font-weight: 700; color: #667eea; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>New Feedback Received</h1>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">A customer has submitted feedback for your attention</p>
+          </div>
+          <div class="content">
+            <div class="feedback-type feedback-{feedback_type}">
+              {feedback_type} Feedback
+            </div>
+            
+            <div class="details-grid">
+              <div class="detail-label">Ticket Number:</div>
+              <div class="detail-value"><strong>{ticket_number}</strong></div>
+              
+              <div class="detail-label">Ticket Title:</div>
+              <div class="detail-value">{ticket_title}</div>
+              
+              <div class="detail-label">Technician:</div>
+              <div class="detail-value">{technician}</div>
+              
+              <div class="detail-label">Customer Name:</div>
+              <div class="detail-value">{customer_name}</div>
+              
+              <div class="detail-label">Customer Email:</div>
+              <div class="detail-value">{customer_email}</div>
+            </div>
+            
+            <div class="comment-section">
+              <h3 style="margin-top: 0; color: #667eea;">Customer Comment:</h3>
+              <p style="margin-bottom: 0;">{comment}</p>
+            </div>
+          </div>
+          <div class="footer">
+            <div class="logo">Wiseserve</div>
+            <p style="margin: 5px 0 0 0;">Professional IT Services & Support</p>
+          </div>
+        </div>
+      </body>
+      </html>
     `;
 
     // Replace variables in subject and template
