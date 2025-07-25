@@ -36,6 +36,16 @@ export const ApiConfig: React.FC = () => {
 
   const { toast } = useToast();
 
+  const isFormValid = () => {
+    return testPayload.ticket_number.trim() !== '' &&
+           testPayload.technician.trim() !== '' &&
+           testPayload.ticket_title.trim() !== '' &&
+           (testPayload.customer_email && testPayload.customer_email.trim() !== '') &&
+           (testPayload.customer_name && testPayload.customer_name.trim() !== '') &&
+           testPayload.expires_hours > 0 &&
+           bearerToken.trim() !== '';
+  };
+
   const testApi = async () => {
     setLoading(true);
     try {
@@ -189,10 +199,16 @@ export const ApiConfig: React.FC = () => {
             />
           </div>
 
-          <Button onClick={testApi} disabled={loading} className="w-full">
+          <Button onClick={testApi} disabled={loading || !isFormValid()} className="w-full">
             <TestTube className="h-4 w-4 mr-2" />
-            {loading ? 'Testing...' : 'Test API'}
+            {loading ? 'Testing...' : !isFormValid() ? 'Fill all required fields' : 'Test API'}
           </Button>
+
+          {!isFormValid() && (
+            <p className="text-sm text-muted-foreground text-center mt-2">
+              Please fill in all required fields to test the API
+            </p>
+          )}
         </div>
 
         {apiResponse && (
