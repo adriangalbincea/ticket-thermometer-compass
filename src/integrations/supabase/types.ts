@@ -238,24 +238,14 @@ export type Database = {
     }
     Functions: {
       create_feedback_link: {
-        Args:
-          | {
-              p_ticket_number: string
-              p_technician: string
-              p_ticket_title: string
-              p_customer_email?: string
-              p_customer_name?: string
-              p_expires_hours?: number
-            }
-          | {
-              p_ticket_number: string
-              p_technician: string
-              p_ticket_title: string
-              p_customer_email?: string
-              p_customer_name?: string
-              p_expires_hours?: number
-              p_default_feedback_type?: string
-            }
+        Args: {
+          p_ticket_number: string
+          p_technician: string
+          p_ticket_title: string
+          p_customer_email?: string
+          p_customer_name?: string
+          p_expires_hours?: number
+        }
         Returns: string
       }
       get_current_user_role: {
