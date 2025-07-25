@@ -147,23 +147,26 @@ export const UserManagement: React.FC = () => {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
+    if (!confirm('Are you sure you want to delete this user? This will permanently remove the user from the system.')) return;
 
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', userId);
+      // Call the edge function to delete user from auth and database
+      const { data, error } = await supabase.functions.invoke('delete-user', {
+        body: { userId }
+      });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
       toast({
         title: "Success",
-        description: "User deleted successfully.",
+        description: "User deleted successfully from the system.",
       });
       
       loadUsers();
     } catch (error: any) {
+      console.error("Delete user error:", error);
       toast({
         title: "Error",
         description: "Failed to delete user: " + error.message,
