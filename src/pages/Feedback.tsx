@@ -18,13 +18,10 @@ const Feedback: React.FC = () => {
   const isValidFeedbackType = urlFeedbackType && ['bad', 'neutral', 'happy'].includes(urlFeedbackType);
 
   useEffect(() => {
-    console.log('Feedback component mounted');
-    console.log('Token from URL params:', token);
-    console.log('Current URL:', window.location.href);
+    alert(`Feedback page loaded with token: ${token}`);
     
     const loadFeedbackLink = async () => {
       if (!token) {
-        console.log('No token provided in URL');
         setError('Invalid feedback link - missing token');
         setLoading(false);
         return;
