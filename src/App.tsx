@@ -51,7 +51,7 @@ const AppRoutes = () => {
           </TwoFactorGuard>
         </ProtectedRoute>
       } />
-      <Route path="/feedback/:token" element={<Feedback />} />
+      <Route path="/feedback/:token" element={<div>Simple feedback test with token</div>} />
       <Route path="/feedback-test" element={<div>Feedback component test</div>} />
       <Route path="/generate-links" element={
         <ProtectedRoute>
