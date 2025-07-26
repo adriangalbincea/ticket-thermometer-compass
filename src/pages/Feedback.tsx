@@ -26,6 +26,8 @@ const Feedback: React.FC = () => {
       }
 
       try {
+        console.log('Checking feedback link token:', token);
+        
         // First check if the link exists at all
         const { data: linkData, error: linkError } = await supabase
           .from('feedback_links')
@@ -33,28 +35,42 @@ const Feedback: React.FC = () => {
           .eq('token', token)
           .maybeSingle();
 
+        console.log('Link query result:', { linkData, linkError });
+
         if (linkError) {
+          console.error('Database error:', linkError);
           setError('Failed to validate feedback link');
           return;
         }
 
         if (!linkData) {
+          console.log('No link found for token:', token);
           setError('Invalid feedback link - link not found');
           return;
         }
 
+        console.log('Link data:', {
+          is_used: linkData.is_used,
+          expires_at: linkData.expires_at,
+          current_time: new Date().toISOString(),
+          is_expired: new Date(linkData.expires_at) <= new Date()
+        });
+
         // Check if already used
         if (linkData.is_used) {
+          console.log('Link already used');
           setError('This feedback link has already been used');
           return;
         }
 
         // Check if expired
         if (new Date(linkData.expires_at) <= new Date()) {
+          console.log('Link expired');
           setError('This feedback link has expired');
           return;
         }
 
+        console.log('Link is valid, setting feedback link');
         // Link is valid
         setFeedbackLink(linkData);
       } catch (err) {
