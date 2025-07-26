@@ -30,7 +30,7 @@ jobs:
 
       - name: Checkout repository
         if: env.BACKUP_ENABLED == 'true'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Supabase CLI
         if: env.BACKUP_ENABLED == 'true'
