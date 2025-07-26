@@ -18,8 +18,6 @@ const Feedback: React.FC = () => {
   const isValidFeedbackType = urlFeedbackType && ['bad', 'neutral', 'happy'].includes(urlFeedbackType);
 
   useEffect(() => {
-    alert(`Feedback page loaded with token: ${token}`);
-    
     const loadFeedbackLink = async () => {
       if (!token) {
         setError('Invalid feedback link - missing token');
