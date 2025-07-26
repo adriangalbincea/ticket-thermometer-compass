@@ -26,20 +26,37 @@ const Feedback: React.FC = () => {
       }
 
       try {
-        // Check if the link exists and is valid
-        const { data, error } = await supabase
+        // First check if the link exists at all
+        const { data: linkData, error: linkError } = await supabase
           .from('feedback_links')
           .select('*')
           .eq('token', token)
-          .eq('is_used', false)
-          .gt('expires_at', new Date().toISOString())
           .maybeSingle();
 
-        if (error || !data) {
-          setError('This feedback link has expired or has already been used');
-        } else {
-          setFeedbackLink(data);
+        if (linkError) {
+          setError('Failed to validate feedback link');
+          return;
         }
+
+        if (!linkData) {
+          setError('Invalid feedback link - link not found');
+          return;
+        }
+
+        // Check if already used
+        if (linkData.is_used) {
+          setError('This feedback link has already been used');
+          return;
+        }
+
+        // Check if expired
+        if (new Date(linkData.expires_at) <= new Date()) {
+          setError('This feedback link has expired');
+          return;
+        }
+
+        // Link is valid
+        setFeedbackLink(linkData);
       } catch (err) {
         setError('Failed to load feedback link');
       } finally {
